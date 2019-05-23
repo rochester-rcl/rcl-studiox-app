@@ -1,7 +1,7 @@
 Rocky mascot augmented reality app.
 
 Unity Setup Notes:
-ARFoundations require Unity 2019.1 +, not sure if this is necessary or just recommended.
+ARFoundations requires Unity 2019.1 +, not sure if this is necessary or just recommended.
   * Make sure to install the Unity recommended Android SDK and NDK from Unity Hub before starting Android development.
  
 Settings to Check Before Building to a Device:
