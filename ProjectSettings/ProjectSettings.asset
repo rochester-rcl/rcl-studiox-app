@@ -159,8 +159,8 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: edu.RCL.UofR_AR_App
-    iPhone: edu.RCL.UofR_AR_App
+    Android: edu.RCL.UofRARApp
+    iPhone: edu.RCL.UofRARApp
   buildNumber: {}
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 24

@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
-using UnityEngine.UI;
+//using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
@@ -33,8 +36,6 @@ public class PlaceOnPlane : MonoBehaviour
     public GameObject spawnedObject { get; private set; }
     private ARSessionOrigin m_SessionOrigin;
 
-    public Text txt;//just for onscreen debugging purposes.
-
     //TODO: Eventually add support for objects without animators.
     private Animator m_anim;
 
@@ -58,11 +59,14 @@ public class PlaceOnPlane : MonoBehaviour
 
     void Update()
     {
+
+       // bool isP = recordButton.OnPointerDown
+
         if (Input.touchCount == 0)
             return;
         
         if (Input.touchCount == 2)
-        {
+        {                   
             Touch touch0 = Input.GetTouch(0);
             Touch touch1 = Input.GetTouch(1);
 
@@ -140,8 +144,6 @@ public class PlaceOnPlane : MonoBehaviour
                 }
             }
         }
-
-        txt.text = in_touch_drag.ToString();
 
         prevObjPos = spawnedObject.transform.position;
   
