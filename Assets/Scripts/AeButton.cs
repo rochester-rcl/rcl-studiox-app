@@ -13,7 +13,12 @@ public class AeButton : Button
 
     protected AeButton() { }
 
-    public override void OnPointerDown(PointerEventData eventData)
+	void Start()
+	{
+        _onDown.AddListener(Ping);
+	}
+
+	public override void OnPointerDown(PointerEventData eventData)
     {
         base.OnPointerDown(eventData);
 
@@ -31,6 +36,11 @@ public class AeButton : Button
     {
         get { return _onDown; }
         set { _onDown = value; }
+    }
+
+    void Ping()
+    {
+        Debug.Log("Ping");
     }
 
     [Serializable]

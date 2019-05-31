@@ -57,6 +57,11 @@ namespace GetSocialSdk.Capture.Scripts
         public void Stop()
         {
             _play = false;
+            _previewInitialized = false;
+            _framesToPlay.Clear();
+            //clean up UI
+            _rawImage.color = Color.clear;
+
         }
         
         #endregion
@@ -88,10 +93,9 @@ namespace GetSocialSdk.Capture.Scripts
             _framesToPlay = new List<Texture2D>();
             _play = false;
         }
-        
+
         private void Start()
         {
-            Debug.Log("load");
            // Init();
             if (_framesToPlay.Count == 0)
             {
@@ -108,7 +112,6 @@ namespace GetSocialSdk.Capture.Scripts
                 _playbackStartTime = Time.time;
             }
             _rawImage.color = Color.white;
-            //Debug.Log("playback active");
             var index = (int) ((Time.time - _playbackStartTime) * playbackFrameRate) % _framesToPlay.Count;
             _rawImage.texture = _framesToPlay[index];
             if (index == _framesToPlay.Count - 1 && !loopPlayback)
