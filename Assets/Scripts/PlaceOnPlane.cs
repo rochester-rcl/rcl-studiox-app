@@ -7,13 +7,6 @@ using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
-/// <summary>
-/// Listens for touch events and performs an AR raycast from the screen touch point.
-/// AR raycasts will only hit detected trackables like feature points and planes.
-/// 
-/// If a raycast hits a trackable, the <see cref="placedPrefab"/> is instantiated
-/// and moved to the hit position.
-/// </summary>
 [RequireComponent(typeof(ARRaycastManager))]
 public class PlaceOnPlane : MonoBehaviour
 {
@@ -48,14 +41,14 @@ public class PlaceOnPlane : MonoBehaviour
 
     private Vector3 prevObjPos = Vector3.zero;
 
+    private bool in_touch_drag = false;
+
     void Awake()
     {
         m_RaycastManager = GetComponent<ARRaycastManager>();
         m_SessionOrigin = GetComponent<ARSessionOrigin>();
 
     }
-
-    private bool in_touch_drag = false;
 
     void Update()
     {
@@ -145,8 +138,11 @@ public class PlaceOnPlane : MonoBehaviour
             }
         }
 
-        prevObjPos = spawnedObject.transform.position;
-  
+        if (spawnedObject != null)
+        {
+            prevObjPos = spawnedObject.transform.position;
+        }
+
     }
 
     static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();
