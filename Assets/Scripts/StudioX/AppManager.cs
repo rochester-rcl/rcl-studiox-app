@@ -10,6 +10,10 @@
 		private static readonly object appManagerLock = new object();
 		private bool firebaseReady;
 		private Firebase.FirebaseApp firebaseApp;
+		private Version MinFirebaseSdkVersion = new Version("6.0.0");
+		private const string _sdkNotFoundVersion = "0.0.0";
+		public static string FirebaseSdkDir {get; set;}
+		public Version FirebaseSdkVersion {get; set;}
 
 		///<summary>The optional name of the Firebase Messaging Topic the app will subscribe to.false Defaults to an empty string.
 		///<para><see cref="Firebase.Messaging.FirebaseMessaging.SubscribeAsync(string)"/> for more details</para> 	
@@ -27,12 +31,31 @@
 			}
 		}
 
+		private void CheckFirebaseSDKVersion () {
+			string sdkVersion = _sdkNotFoundVersion;
+			if (System.IO.Directory.Exists(FirebaseSdkDir)) {
+				try {
+					System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
+					doc.Load(string.Format("{0}m2repository/com/google/firebase/firebase-app-unity/maven-metadata.xml", FirebaseSdkDir));
+					System.Xml.XmlNodeList versions = doc.SelectNodes("metadata/versioning/release");
+					if (versions.Count > 0) sdkVersion = versions[0].InnerText;
+				} catch (Exception ex) {
+					Debug.LogWarning(ex);
+				}
+			}
+			FirebaseSdkVersion = new Version(sdkVersion);
+		}
+
 		public void Start () {
 			InitFirebase();
 		}
 
 		public void Awake() {
+			if (string.IsNullOrEmpty(FirebaseSdkDir)) {
+				FirebaseSdkDir = string.Format("{0}/Firebase/", Application.dataPath);
+			}
 			if (_instance != null && _instance != this) {
+				Debug.LogWarning("Another instance of AppManager was found in the scene. Destroying the current instance.");
 				Destroy(gameObject);
 			} else {
 				_instance = this;
@@ -49,6 +72,13 @@
 		///<para>See <see cref="Firebase.FirebaseApp.CheckAndFixDependenciesAsync"/> for more details</para> 	
 		///</summary>
 		public void InitFirebase() {
+			CheckFirebaseSDKVersion();
+			if (FirebaseSdkVersion.Equals(new Version(_sdkNotFoundVersion))) {
+				Debug.LogError("No Firebase SDK found. Are you sure you imported the packages?");
+			} else if (!FirebaseSdkVersion.Equals(MinFirebaseSdkVersion)) {
+				Debug.LogWarning(string.Format("Firebase SDK Version ({0}) is different than the one used for this project ({1}). This may result in errors.", FirebaseSdkVersion, MinFirebaseSdkVersion));
+			}
+
 			// From https://firebase.google.com/docs/cloud-messaging/unity/client
 			Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task => {
 				var dependencyStatus = task.Result;
@@ -80,6 +110,7 @@
 				Debug.Log("Could not initialize Firebase event handlers");
 			}
 		}
+
 		///<summary>Logs the status of a <see cref="System.Threading.Tasks.Task"/> 
 		///<para>Responsible for setting StudioX.AppManager.firebaseApp and StudioX.AppManager.firebaseReady if <see cref="Firebase.DependencyStatus"/> is set to Available.</para>
 		///<para>See <see cref="Firebase.FirebaseApp.CheckAndFixDependenciesAsync"/> for more details</para>
@@ -106,6 +137,7 @@
 			}
 			return status;
 		}
+
 		///<summary>Event handler for <see cref="Firebase.Messaging.FirebaseMessaging.TokenReceived"/>
 		///<para> Used for debugging - token can be used to send test messages to a specific device via FCM </para>
 		///<param name="sender">The source of the event</param>
