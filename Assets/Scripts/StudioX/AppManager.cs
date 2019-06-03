@@ -75,12 +75,15 @@
 		///<para>See <see cref="Firebase.FirebaseApp.CheckAndFixDependenciesAsync"/> for more details</para> 	
 		///</summary>
 		public void InitFirebase() {
-			CheckFirebaseSDKVersion();
-			if (FirebaseSdkVersion.Equals(new Version(_sdkNotFoundVersion))) {
-				Debug.LogError("No Firebase SDK found. Are you sure you imported the packages?");
-			} else if (!FirebaseSdkVersion.Equals(MinFirebaseSdkVersion)) {
-				Debug.LogWarning(string.Format("Firebase SDK Version ({0}) is different than the one used for this project ({1}). This may result in errors.", FirebaseSdkVersion, MinFirebaseSdkVersion));
-			}
+
+			# if UNITY_EDITOR
+				CheckFirebaseSDKVersion();
+				if (FirebaseSdkVersion.Equals(new Version(_sdkNotFoundVersion))) {
+					Debug.LogError("No Firebase SDK found. Are you sure you imported the packages?");
+				} else if (!FirebaseSdkVersion.Equals(MinFirebaseSdkVersion)) {
+					Debug.LogWarning(string.Format("Firebase SDK Version ({0}) is different than the one used for this project ({1}). This may result in errors.", FirebaseSdkVersion, MinFirebaseSdkVersion));
+				}
+			# endif
 
 			// From https://firebase.google.com/docs/cloud-messaging/unity/client
 			Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task => {
