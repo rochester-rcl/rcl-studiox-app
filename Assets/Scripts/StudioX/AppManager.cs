@@ -31,6 +31,9 @@
 			}
 		}
 
+		///<summary>Checks the Firebase SDK version based on maven-metadata.xml found in the package.
+		///<para>Sets <see cref="AppManager.FirebaseSdkVersion)"/> if found. If not, the version is set to 0.0.0</para> 	
+		///</summary>
 		private void CheckFirebaseSDKVersion () {
 			string sdkVersion = _sdkNotFoundVersion;
 			if (System.IO.Directory.Exists(FirebaseSdkDir)) {
