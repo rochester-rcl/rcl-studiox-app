@@ -238,6 +238,7 @@ MonoBehaviour:
   recordButtonBG: {fileID: 402732362}
   cancelButton: {fileID: 1754534441}
   SaveButton: {fileID: 1494819042}
+  recordButtonFG: {fileID: 1632743406}
 --- !u!1 &374903240
 GameObject:
   m_ObjectHideFlags: 0

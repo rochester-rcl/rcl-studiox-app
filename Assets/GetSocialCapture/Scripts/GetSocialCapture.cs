@@ -191,6 +191,7 @@ namespace GetSocialSdk.Capture.Scripts
             
             var fileName = string.Format("result-{0}.gif", _captureId);
             _resultFilePath = GetResultDirectory() + Path.DirectorySeparatorChar + fileName;
+            Debug.Log("rs path: " + _resultFilePath);
             StoreWorker.Instance.Start(ThreadPriority.BelowNormal, maxCapturedFrames);
         }
         

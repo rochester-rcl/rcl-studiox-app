@@ -10,6 +10,11 @@ Assets/AssetStoreTools*
 /.vs/
 .vscode
 
+#Emacs
+*~
+.#*
+#*
+
 # Ignore manually added packages
 com.*
 

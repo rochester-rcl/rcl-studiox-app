@@ -20,6 +20,8 @@ public class RecordingController : MonoBehaviour
     private GameObject cancelButton;
     [SerializeField]
     private GameObject SaveButton;
+    [SerializeField]
+    private GameObject recordButtonFG;
 
     private bool isRecording;
     private bool off = false;
@@ -51,11 +53,11 @@ public class RecordingController : MonoBehaviour
     public void SaveResult()
     {
         Debug.Log("starting gif generation");
-        //Action<byte[]> result = bytes =>
-        //{
+        Action<byte[]> result = bytes =>
+        {
 
-        //};
-        //_capture.GenerateCapture(result);
+        };
+        _capture.GenerateCapture(result);
     }
 
     public void CancelResult()
@@ -105,8 +107,9 @@ public class RecordingController : MonoBehaviour
     {
         recordButton.GetComponent<LongPressButton>().enabled = _defaultState;//need seperate call since LongPressButton != Button
         recordButton.GetComponent<Image>().enabled = _defaultState;
-
+        
         recordButtonBG.GetComponent<Image>().enabled = _defaultState;
+        recordButtonFG.GetComponent<Image>().enabled = _defaultState;
 
         toggleButton(!_defaultState, ref SaveButton);
         toggleButton(!_defaultState, ref cancelButton);
