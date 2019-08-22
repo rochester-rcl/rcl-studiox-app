@@ -5,6 +5,8 @@
     using System.Threading.Tasks;
     using System;
     using UnityEngine;
+    using UnityEngine.SceneManagement;
+    using System.Text.RegularExpressions;
     ///<summary>Singleton class to be used to manage scene changes, Firebase support, and any other housekeeping</summary>
     public class AppManager : MonoBehaviour
     {
@@ -14,15 +16,18 @@
         private Firebase.FirebaseApp firebaseApp;
         private Version MinFirebaseSdkVersion = new Version("6.3.0");
         private const string _sdkNotFoundVersion = "0.0.0";
+        private FullscreenFade FadeController { get; set; }
         public static string FirebaseSdkDir { get; set; }
         public Version FirebaseSdkVersion { get; set; }
+        public string landingScene;
+        public int landingDuration = 3;
+        public GameObject loadingScreen;
+        public string menuScene;
 
         ///<summary>The optional name of the Firebase Messaging Topic the app will subscribe to.false Defaults to an empty string.
         ///<para><see cref="Firebase.Messaging.FirebaseMessaging.SubscribeAsync(string)"/> for more details</para> 	
         ///</summary>
-        [SerializeField]
-        [Tooltip("Firebase Messaging Channel to Subscribe To")]
-        public string topic;
+        public string firebaseMessagingTopic;
 
         ///<summary>Static thread-safe singleton instance of AppManager</summary>
         public static AppManager Instance
@@ -61,7 +66,101 @@
 
         public void Start()
         {
+            InitLoadingScreen();
             InitFirebase();
+            DisplayLanding();
+        }
+
+        public void InitLoadingScreen()
+        {
+            if (loadingScreen)
+            {
+                Instantiate(loadingScreen, new Vector3(0, 0, 0), Quaternion.identity);
+                // initialize fading for loading screen
+                FadeController = gameObject.AddComponent(typeof(FullscreenFade)) as FullscreenFade;
+                FullscreenFade.OnFadeOutEnds += HideLoadingScreen;
+                ShowLoadingScreen();
+            }
+        }
+
+        public void ShowLoadingScreen()
+        {
+            loadingScreen.SetActive(true);
+            FadeController.triggerFadeIn();
+        }
+
+        public void FadeOutLoadingScreen()
+        {
+            FadeController.triggerFadeOut();
+        }
+
+        public void HideLoadingScreen()
+        {
+            loadingScreen.SetActive(false);
+        }
+
+        public void DisplayLanding()
+        {
+            if (!string.IsNullOrWhiteSpace(landingScene))
+            {
+                AsyncOperation op = SceneManager.LoadSceneAsync(landingScene);
+                op.allowSceneActivation = true;
+                op.completed += new Action<AsyncOperation>((AsyncOperation asyncOp) => LandingTimeout(landingDuration));
+            }
+            else
+            {
+                LandingTimeout(landingDuration);
+                Debug.LogError("No Landing Scene Set for App Manager!");
+            }
+        }
+
+        public void LandingTimeout(int duration)
+        {
+            IEnumerator coroutine = DoLandingTimeout(duration);
+            StartCoroutine(coroutine);
+        }
+
+        private IEnumerator DoLandingTimeout(int duration)
+        {
+            yield return new WaitForSeconds(duration);
+            ShowMenuScene();
+        }
+
+        public void ShowMenuScene()
+        {
+            if (!string.IsNullOrWhiteSpace(menuScene))
+            {
+                LoadScene(menuScene);
+            }
+        }
+
+        public void LoadScene(string sceneName)
+        {
+            IEnumerator coroutine = DoLoadScene(sceneName);
+            StartCoroutine(coroutine);
+        }
+
+        private IEnumerator DoLoadScene(string sceneName)
+        {
+            AsyncOperation op = SceneManager.LoadSceneAsync(menuScene);
+            op.allowSceneActivation = false;
+            ShowLoadingScreen();
+            while (!op.isDone)
+            {
+                yield return null;
+                if (op.progress >= 0.9f)
+                {
+                    FadeController.FadeOutAsync().ContinueWith(t =>
+                    {
+                        op.allowSceneActivation = true;
+                    });
+                }
+            }
+        }
+
+        private async WaitForLoadScene()
+        {
+            
         }
 
         public void Awake()
@@ -85,6 +184,11 @@
         public void Update()
         {
 
+        }
+
+        public void OnDisable()
+        {
+            FullscreenFade.OnFadeOutEnds -= HideLoadingScreen;
         }
 
         ///<summary>Initializes the Firebase app, checks for dependencies. 
@@ -134,13 +238,17 @@
             {
                 Firebase.Messaging.FirebaseMessaging.TokenReceived += OnTokenReceived;
                 Firebase.Messaging.FirebaseMessaging.MessageReceived += OnMessageReceived;
-                if (!String.IsNullOrEmpty(topic))
+                Debug.Log(firebaseMessagingTopic.Length);
+                if (!string.IsNullOrWhiteSpace(firebaseMessagingTopic))
                 {
-                    Firebase.Messaging.FirebaseMessaging.SubscribeAsync(topic).ContinueWith(task =>
+                    string fbTopic = firebaseMessagingTopic.ToLower().Replace(" ", "-");
+                    Debug.Log(string.Format("Subscribing to topic {0}", fbTopic));
+                    Firebase.Messaging.FirebaseMessaging.SubscribeAsync(fbTopic).ContinueWith(task =>
                     {
                         LogTaskStatus(task, "SubscribeAsync");
                     });
                 }
+
             }
             else
             {
