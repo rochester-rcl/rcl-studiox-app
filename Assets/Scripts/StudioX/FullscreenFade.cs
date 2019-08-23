@@ -153,26 +153,15 @@ public class FullscreenFade : MonoBehaviour
     }
 
     // ASYNC FADES 
-    public Task FadeInAsync()
+    public async Task FadeInAsync()
     {
-        Task t = new Task(() =>
-        {
-            triggerFadeIn();
-            while (fadeInTriggered)
-            {
-                Debug.Log("waiting for fade in to complete");
-            }
-        });
-        return t;
-    }
-
-    private void FadeOut()
-    {
-        Debug.Log("Hi");
+        triggerFadeIn();
+        await Task.Delay((int)fadeDuration * 1000);
     }
 
     public async Task FadeOutAsync()
     {
-        await Task.Run(FadeOut);
+        triggerFadeOut();
+        await Task.Delay((int)fadeDuration * 1000);
     }
 }

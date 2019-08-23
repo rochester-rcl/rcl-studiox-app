@@ -41,6 +41,131 @@
             }
         }
 
+        public static void SetScene(string sceneName)
+        {
+
+        }
+
+        public void Start()
+        {
+            InitLoadingScreen();
+            InitFirebase();
+            DisplayLanding();
+        }
+
+        public void InitLoadingScreen()
+        {
+            if (loadingScreen)
+            {
+                Instantiate(loadingScreen, new Vector3(0, 0, 0), Quaternion.identity);
+                // initialize fading for loading screen
+                FadeController = gameObject.AddComponent(typeof(FullscreenFade)) as FullscreenFade;
+                loadingScreen.SetActive(false);
+                ShowLoadingScreen();
+            }
+        }
+
+        public void ShowLoadingScreen()
+        {
+            if (!loadingScreen.activeSelf)
+            {
+                loadingScreen.SetActive(true);
+                StartCoroutine(FadeAsync(true));
+            }
+        }
+
+        public void DisplayLanding()
+        {
+            if (!string.IsNullOrWhiteSpace(landingScene))
+            {
+                AsyncOperation op = SceneManager.LoadSceneAsync(landingScene);
+                op.allowSceneActivation = true;
+                op.completed += new Action<AsyncOperation>((AsyncOperation asyncOp) => LandingTimeout(landingDuration));
+            }
+            else
+            {
+                LandingTimeout(landingDuration);
+                Debug.Log("No Landing Scene Set for App Manager. Showing Loading Screen Instead.");
+            }
+        }
+
+        public void LandingTimeout(int duration)
+        {
+            StartCoroutine(DoLandingTimeout(duration));
+        }
+
+        private IEnumerator DoLandingTimeout(int duration)
+        {
+            yield return new WaitForSeconds(duration);
+            ShowMenuScene();
+        }
+
+        public void ShowMenuScene()
+        {
+            if (!string.IsNullOrWhiteSpace(menuScene))
+            {
+                IEnumerator coroutine = LoadScene(menuScene);
+                StartCoroutine(coroutine);
+            }
+        }
+
+        private IEnumerator LoadScene(string sceneName)
+        {
+            AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
+            op.allowSceneActivation = false;
+            ShowLoadingScreen();
+            while (!op.isDone)
+            {
+                if (op.progress >= 0.9f)
+                {
+                    Coroutine fade = StartCoroutine(FadeAsync(false));
+                    yield return fade;
+                    op.allowSceneActivation = true;
+                }
+                yield return null;
+            }
+        }
+
+        private IEnumerator FadeAsync(bool fadeIn)
+        {
+            if (fadeIn)
+            {
+                Task t = FadeController.FadeInAsync();
+                while (!t.IsCompleted)
+                {
+                    yield return null;
+                }
+            }
+            else
+            {
+                Task t = FadeController.FadeOutAsync();
+                while (!t.IsCompleted)
+                {
+                    yield return null;
+                }
+            }
+        }
+
+        public void Awake()
+        {
+            if (string.IsNullOrEmpty(FirebaseSdkDir))
+            {
+                FirebaseSdkDir = string.Format("{0}/Firebase/", Application.dataPath);
+            }
+            if (_instance != null && _instance != this)
+            {
+                Debug.LogWarning("Another instance of AppManager was found in the scene. Destroying the current instance.");
+                Destroy(gameObject);
+            }
+            else
+            {
+                _instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+        }
+
+        /********** FIREBASE METHODS **********/
+
         ///<summary>Checks the Firebase SDK version based on maven-metadata.xml found in the package.
         ///<para>Sets <see cref="AppManager.FirebaseSdkVersion)"/> if found. If not, the version is set to 0.0.0</para> 	
         ///</summary>
@@ -62,133 +187,6 @@
                 }
             }
             FirebaseSdkVersion = new Version(sdkVersion);
-        }
-
-        public void Start()
-        {
-            InitLoadingScreen();
-            InitFirebase();
-            DisplayLanding();
-        }
-
-        public void InitLoadingScreen()
-        {
-            if (loadingScreen)
-            {
-                Instantiate(loadingScreen, new Vector3(0, 0, 0), Quaternion.identity);
-                // initialize fading for loading screen
-                FadeController = gameObject.AddComponent(typeof(FullscreenFade)) as FullscreenFade;
-                FullscreenFade.OnFadeOutEnds += HideLoadingScreen;
-                ShowLoadingScreen();
-            }
-        }
-
-        public void ShowLoadingScreen()
-        {
-            loadingScreen.SetActive(true);
-            FadeController.triggerFadeIn();
-        }
-
-        public void FadeOutLoadingScreen()
-        {
-            FadeController.triggerFadeOut();
-        }
-
-        public void HideLoadingScreen()
-        {
-            loadingScreen.SetActive(false);
-        }
-
-        public void DisplayLanding()
-        {
-            if (!string.IsNullOrWhiteSpace(landingScene))
-            {
-                AsyncOperation op = SceneManager.LoadSceneAsync(landingScene);
-                op.allowSceneActivation = true;
-                op.completed += new Action<AsyncOperation>((AsyncOperation asyncOp) => LandingTimeout(landingDuration));
-            }
-            else
-            {
-                LandingTimeout(landingDuration);
-                Debug.LogError("No Landing Scene Set for App Manager!");
-            }
-        }
-
-        public void LandingTimeout(int duration)
-        {
-            IEnumerator coroutine = DoLandingTimeout(duration);
-            StartCoroutine(coroutine);
-        }
-
-        private IEnumerator DoLandingTimeout(int duration)
-        {
-            yield return new WaitForSeconds(duration);
-            ShowMenuScene();
-        }
-
-        public void ShowMenuScene()
-        {
-            if (!string.IsNullOrWhiteSpace(menuScene))
-            {
-                LoadScene(menuScene);
-            }
-        }
-
-        public void LoadScene(string sceneName)
-        {
-            IEnumerator coroutine = DoLoadScene(sceneName);
-            StartCoroutine(coroutine);
-        }
-
-        private IEnumerator DoLoadScene(string sceneName)
-        {
-            AsyncOperation op = SceneManager.LoadSceneAsync(menuScene);
-            op.allowSceneActivation = false;
-            ShowLoadingScreen();
-            while (!op.isDone)
-            {
-                yield return null;
-                if (op.progress >= 0.9f)
-                {
-                    FadeController.FadeOutAsync().ContinueWith(t =>
-                    {
-                        op.allowSceneActivation = true;
-                    });
-                }
-            }
-        }
-
-        private async WaitForLoadScene()
-        {
-            
-        }
-
-        public void Awake()
-        {
-            if (string.IsNullOrEmpty(FirebaseSdkDir))
-            {
-                FirebaseSdkDir = string.Format("{0}/Firebase/", Application.dataPath);
-            }
-            if (_instance != null && _instance != this)
-            {
-                Debug.LogWarning("Another instance of AppManager was found in the scene. Destroying the current instance.");
-                Destroy(gameObject);
-            }
-            else
-            {
-                _instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
-        }
-
-        public void Update()
-        {
-
-        }
-
-        public void OnDisable()
-        {
-            FullscreenFade.OnFadeOutEnds -= HideLoadingScreen;
         }
 
         ///<summary>Initializes the Firebase app, checks for dependencies. 
