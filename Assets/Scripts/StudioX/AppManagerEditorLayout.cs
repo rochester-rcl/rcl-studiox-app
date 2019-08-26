@@ -27,22 +27,24 @@ namespace StudioX
             loadingScreen = serializedObject.FindProperty("loadingScreen");
             menuScene = serializedObject.FindProperty("menuScene");
             firebaseMessagingTopic = serializedObject.FindProperty("firebaseMessagingTopic");
+            LoadPrefs();
+        }
 
-            // Hydrate the private objects set here
+        private void SavePrefs()
+        {
+            string data = JsonUtility.ToJson(this, false);
+            if (!string.IsNullOrEmpty(data))
+            {
+                EditorPrefs.SetString(EditorPrefsKey, data);
+            }
+        }
+
+        private void LoadPrefs()
+        {
             string data = EditorPrefs.GetString(EditorPrefsKey, JsonUtility.ToJson(this, false));
             if (!string.IsNullOrEmpty(data))
             {
                 JsonUtility.FromJsonOverwrite(data, this);
-            }
-        }
-
-        void SavePrefs()
-        {
-            string data = JsonUtility.ToJson(this, false);
-            Debug.Log(data);
-            if (!string.IsNullOrEmpty(data))
-            {
-                EditorPrefs.SetString(EditorPrefsKey, data);
             }
         }
 

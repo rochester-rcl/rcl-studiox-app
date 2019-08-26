@@ -9,9 +9,15 @@ namespace StudioX
     {
         public Button MenuButton { get; set; }
         public string sceneName;
+        private AppManager Manager { get; set; }
         public void Start()
         {
-            MenuButton = GetComponent<Button>();
+            MenuButton = GetComponent<Button>() as Button;
+            Manager = AppManager.GetManager();
+            if (!Manager)
+            {
+                Debug.LogError("There must be an instance of AppManager attached to a GameObject in the scene");
+            }
             if (MenuButton)
             {
                 MenuButton.onClick.AddListener(ClickHandler);
@@ -23,7 +29,11 @@ namespace StudioX
         }
         public void ClickHandler()
         {
-           Debug.Log(sceneName);
+            Debug.Log(sceneName);
+            if (Manager)
+            {
+                Manager.LoadScene(sceneName);
+            }
         }
     }
 }

@@ -7,6 +7,8 @@
     using UnityEngine;
     using UnityEngine.SceneManagement;
     using System.Text.RegularExpressions;
+
+
     ///<summary>Singleton class to be used to manage scene changes, Firebase support, and any other housekeeping</summary>
     public class AppManager : MonoBehaviour
     {
@@ -17,6 +19,8 @@
         private Version MinFirebaseSdkVersion = new Version("6.3.0");
         private const string _sdkNotFoundVersion = "0.0.0";
         private FullscreenFade FadeController { get; set; }
+        private enum AppState { Loading, Landing, Menu, Default };
+        private AppState CurrentAppState { get; set; }
         public static string FirebaseSdkDir { get; set; }
         public Version FirebaseSdkVersion { get; set; }
         public string landingScene;
@@ -41,9 +45,9 @@
             }
         }
 
-        public static void SetScene(string sceneName)
+        public static AppManager GetManager()
         {
-
+            return GameObject.FindObjectOfType(typeof(AppManager)) as AppManager;
         }
 
         public void Start()
@@ -78,38 +82,25 @@
         {
             if (!string.IsNullOrWhiteSpace(landingScene))
             {
-                AsyncOperation op = SceneManager.LoadSceneAsync(landingScene);
-                op.allowSceneActivation = true;
-                op.completed += new Action<AsyncOperation>((AsyncOperation asyncOp) => LandingTimeout(landingDuration));
+                StartCoroutine(LoadAsyncScene(landingScene, AppState.Loading, AppState.Landing));
             }
             else
             {
-                LandingTimeout(landingDuration);
+                CurrentAppState = AppState.Landing;
+                ShowLoadingScreen();
                 Debug.Log("No Landing Scene Set for App Manager. Showing Loading Screen Instead.");
             }
-        }
-
-        public void LandingTimeout(int duration)
-        {
-            StartCoroutine(DoLandingTimeout(duration));
-        }
-
-        private IEnumerator DoLandingTimeout(int duration)
-        {
-            yield return new WaitForSeconds(duration);
-            ShowMenuScene();
         }
 
         public void ShowMenuScene()
         {
             if (!string.IsNullOrWhiteSpace(menuScene))
             {
-                IEnumerator coroutine = LoadScene(menuScene);
-                StartCoroutine(coroutine);
+                StartCoroutine(LoadAsyncScene(menuScene, AppState.Landing, AppState.Menu));
             }
         }
 
-        private IEnumerator LoadScene(string sceneName)
+        private IEnumerator LoadAsyncScene(string sceneName)
         {
             AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
             op.allowSceneActivation = false;
@@ -124,10 +115,49 @@
                 }
                 yield return null;
             }
+            Coroutine fadeIn = StartCoroutine(FadeAsync(true));
+            yield return fadeIn;
+            CurrentAppState = AppState.Default;
         }
 
-        private IEnumerator FadeAsync(bool fadeIn)
+        private IEnumerator LoadAsyncScene(string sceneName, AppState start, AppState end)
         {
+            CurrentAppState = start;
+            AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
+            op.allowSceneActivation = false;
+            ShowLoadingScreen();
+            while (!op.isDone)
+            {
+                if (op.progress >= 0.9f)
+                {
+                    Coroutine fade = StartCoroutine(FadeAsync(false));
+                    yield return fade;
+                    op.allowSceneActivation = true;
+                }
+                yield return null;
+            }
+            Coroutine fadeIn = StartCoroutine(FadeAsync(true));
+            yield return fadeIn;
+            CurrentAppState = end;
+        }
+
+        public void LoadScene(string sceneName)
+        {
+            StartCoroutine(LoadAsyncScene(sceneName));
+        }
+
+        private void LoadScene(string sceneName, AppState start, AppState end)
+        {
+            StartCoroutine(LoadAsyncScene(sceneName, start, end));
+        }
+
+        private IEnumerator FadeAsync(bool fadeIn, bool updateSortOrder = false)
+        {
+            if (updateSortOrder)
+            {
+                FadeController.UpdateSortingOrder();
+            }
+
             if (fadeIn)
             {
                 Task t = FadeController.FadeInAsync();
@@ -162,6 +192,30 @@
                 _instance = this;
                 DontDestroyOnLoad(gameObject);
             }
+        }
+
+        private void HandleInput()
+        {
+            if (CurrentAppState == AppState.Landing)
+            {
+                if (Input.touchCount > 0 || Input.GetMouseButtonDown(0))
+                {
+                    LoadScene(menuScene, AppState.Menu, AppState.Menu);
+                }
+            }
+
+            if (CurrentAppState == AppState.Default)
+            {
+                if (Input.GetKey(KeyCode.Escape))
+                {
+                    LoadScene(menuScene, AppState.Menu, AppState.Menu);
+                }
+            }
+        }
+
+        public void Update()
+        {
+            HandleInput();
         }
 
         /********** FIREBASE METHODS **********/

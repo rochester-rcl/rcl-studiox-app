@@ -60,6 +60,11 @@ public class FullscreenFade : MonoBehaviour
         return maxSortingOrder;
     }
 
+    public void UpdateSortingOrder()
+    {
+        fadeCanvas.GetComponent<Canvas>().sortingOrder = GetMaxSortingOrder() + 1;
+    }
+
     /*** Fades ***/
     public void initFadeImage()
     {
@@ -79,6 +84,7 @@ public class FullscreenFade : MonoBehaviour
         fadeImage = fadeCanvas.AddComponent<Image>();
         fadeImage.color = fadeColor;
         fadeImage.enabled = true;
+        DontDestroyOnLoad(fadeCanvas);
     }
 
     public void triggerFadeIn()
