@@ -61,33 +61,53 @@
         {
             if (loadingScreen)
             {
-                Instantiate(loadingScreen, new Vector3(0, 0, 0), Quaternion.identity);
+                loadingScreen = Instantiate(loadingScreen, new Vector3(0, 0, 0), Quaternion.identity);
+                DontDestroyOnLoad(loadingScreen);
                 // initialize fading for loading screen
                 FadeController = gameObject.AddComponent(typeof(FullscreenFade)) as FullscreenFade;
                 loadingScreen.SetActive(false);
-                ShowLoadingScreen();
+                ToggleLoadingScreen(true);
             }
         }
 
-        public void ShowLoadingScreen()
+        public Coroutine ToggleLoadingScreen(bool active)
         {
-            if (!loadingScreen.activeSelf)
+            if (active)
             {
-                loadingScreen.SetActive(true);
-                StartCoroutine(FadeAsync(true));
+                return StartCoroutine(ShowLoadingScreen());
             }
+            else
+            {
+                return StartCoroutine(HideLoadingScreen());
+            }
+        }
+
+        public IEnumerator HideLoadingScreen()
+        {
+            Coroutine fade = StartCoroutine(FadeAsync(false));
+            yield return fade;
+            loadingScreen.SetActive(false);
+        }
+
+        public IEnumerator ShowLoadingScreen()
+        {
+            Coroutine fade = StartCoroutine(FadeAsync(false));
+            yield return fade;
+            loadingScreen.SetActive(true);
+            fade = StartCoroutine(FadeAsync(true));
+            yield return fade;
         }
 
         public void DisplayLanding()
         {
             if (!string.IsNullOrWhiteSpace(landingScene))
             {
-                StartCoroutine(LoadAsyncScene(landingScene, AppState.Loading, AppState.Landing));
+                StartCoroutine(LoadAsyncScene(landingScene, AppState.Landing));
             }
             else
             {
                 CurrentAppState = AppState.Landing;
-                ShowLoadingScreen();
+                ToggleLoadingScreen(true);
                 Debug.Log("No Landing Scene Set for App Manager. Showing Loading Screen Instead.");
             }
         }
@@ -96,48 +116,43 @@
         {
             if (!string.IsNullOrWhiteSpace(menuScene))
             {
-                StartCoroutine(LoadAsyncScene(menuScene, AppState.Landing, AppState.Menu));
+                StartCoroutine(LoadAsyncScene(menuScene, AppState.Menu));
             }
+        }
+
+        private IEnumerator LoadAsyncSceneInternal(string sceneName)
+        {
+            AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
+            op.allowSceneActivation = false;
+            Coroutine fade = ToggleLoadingScreen(true);
+            yield return fade;
+            while (!op.isDone)
+            {
+                if (op.progress >= 0.9f)
+                {
+                    fade = ToggleLoadingScreen(false);
+                    yield return fade;
+                    op.allowSceneActivation = true;
+                }
+                yield return null;
+            }
+            Coroutine fadeIn = StartCoroutine(FadeAsync(true));
+            yield return fadeIn;
         }
 
         private IEnumerator LoadAsyncScene(string sceneName)
         {
-            AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
-            op.allowSceneActivation = false;
-            ShowLoadingScreen();
-            while (!op.isDone)
-            {
-                if (op.progress >= 0.9f)
-                {
-                    Coroutine fade = StartCoroutine(FadeAsync(false));
-                    yield return fade;
-                    op.allowSceneActivation = true;
-                }
-                yield return null;
-            }
-            Coroutine fadeIn = StartCoroutine(FadeAsync(true));
-            yield return fadeIn;
+            CurrentAppState = AppState.Loading;
+            Coroutine loader = StartCoroutine(LoadAsyncSceneInternal(sceneName));
+            yield return loader;
             CurrentAppState = AppState.Default;
         }
 
-        private IEnumerator LoadAsyncScene(string sceneName, AppState start, AppState end)
+        private IEnumerator LoadAsyncScene(string sceneName, AppState end)
         {
-            CurrentAppState = start;
-            AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
-            op.allowSceneActivation = false;
-            ShowLoadingScreen();
-            while (!op.isDone)
-            {
-                if (op.progress >= 0.9f)
-                {
-                    Coroutine fade = StartCoroutine(FadeAsync(false));
-                    yield return fade;
-                    op.allowSceneActivation = true;
-                }
-                yield return null;
-            }
-            Coroutine fadeIn = StartCoroutine(FadeAsync(true));
-            yield return fadeIn;
+            CurrentAppState = AppState.Loading;
+            Coroutine loader = StartCoroutine(LoadAsyncSceneInternal(sceneName));
+            yield return loader;
             CurrentAppState = end;
         }
 
@@ -146,9 +161,9 @@
             StartCoroutine(LoadAsyncScene(sceneName));
         }
 
-        private void LoadScene(string sceneName, AppState start, AppState end)
+        private void LoadScene(string sceneName, AppState end)
         {
-            StartCoroutine(LoadAsyncScene(sceneName, start, end));
+            StartCoroutine(LoadAsyncScene(sceneName, end));
         }
 
         private IEnumerator FadeAsync(bool fadeIn, bool updateSortOrder = false)
@@ -200,7 +215,7 @@
             {
                 if (Input.touchCount > 0 || Input.GetMouseButtonDown(0))
                 {
-                    LoadScene(menuScene, AppState.Menu, AppState.Menu);
+                    LoadScene(menuScene, AppState.Menu);
                 }
             }
 
@@ -208,7 +223,7 @@
             {
                 if (Input.GetKey(KeyCode.Escape))
                 {
-                    LoadScene(menuScene, AppState.Menu, AppState.Menu);
+                    LoadScene(menuScene, AppState.Menu);
                 }
             }
         }
