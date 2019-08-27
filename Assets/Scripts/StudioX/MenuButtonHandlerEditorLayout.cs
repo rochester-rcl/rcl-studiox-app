@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
+#if UNITY_EDITOR
 namespace StudioX
 {
-#if UNITY_EDITOR
     [CustomEditor(typeof(MenuButtonHandler))]
     public class MenuButtonHandlerEditorLayout : Editor
     {
@@ -54,5 +54,4 @@ namespace StudioX
         }
     }
 }
-
 #endif

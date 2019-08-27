@@ -120,12 +120,17 @@
             }
         }
 
-        private IEnumerator LoadAsyncSceneInternal(string sceneName)
+        private IEnumerator LoadAsyncSceneInternal(string sceneName, bool showLoadingScreen = true)
         {
+            Coroutine fade;
+            if (showLoadingScreen)
+            {
+                fade = ToggleLoadingScreen(true);
+                yield return fade;
+            }
+            
             AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
             op.allowSceneActivation = false;
-            Coroutine fade = ToggleLoadingScreen(true);
-            yield return fade;
             while (!op.isDone)
             {
                 if (op.progress >= 0.9f)
@@ -140,30 +145,30 @@
             yield return fadeIn;
         }
 
-        private IEnumerator LoadAsyncScene(string sceneName)
+        private IEnumerator LoadAsyncScene(string sceneName, bool showLoadingScreen = true)
         {
             CurrentAppState = AppState.Loading;
-            Coroutine loader = StartCoroutine(LoadAsyncSceneInternal(sceneName));
+            Coroutine loader = StartCoroutine(LoadAsyncSceneInternal(sceneName, showLoadingScreen));
             yield return loader;
             CurrentAppState = AppState.Default;
         }
 
-        private IEnumerator LoadAsyncScene(string sceneName, AppState end)
+        private IEnumerator LoadAsyncScene(string sceneName, AppState end, bool showLoadingScreen = true)
         {
             CurrentAppState = AppState.Loading;
-            Coroutine loader = StartCoroutine(LoadAsyncSceneInternal(sceneName));
+            Coroutine loader = StartCoroutine(LoadAsyncSceneInternal(sceneName, showLoadingScreen));
             yield return loader;
             CurrentAppState = end;
         }
 
-        public void LoadScene(string sceneName)
+        public void LoadScene(string sceneName, bool showLoadingScreen = true)
         {
-            StartCoroutine(LoadAsyncScene(sceneName));
+            StartCoroutine(LoadAsyncScene(sceneName, showLoadingScreen));
         }
 
-        private void LoadScene(string sceneName, AppState end)
+        private void LoadScene(string sceneName, AppState end, bool showLoadingScreen = true)
         {
-            StartCoroutine(LoadAsyncScene(sceneName, end));
+            StartCoroutine(LoadAsyncScene(sceneName, end, showLoadingScreen));
         }
 
         private IEnumerator FadeAsync(bool fadeIn, bool updateSortOrder = false)
@@ -193,7 +198,7 @@
 
         public void Awake()
         {
-            if (string.IsNullOrEmpty(FirebaseSdkDir))
+            if (string.IsNullOrWhiteSpace(FirebaseSdkDir))
             {
                 FirebaseSdkDir = string.Format("{0}/Firebase/", Application.dataPath);
             }
@@ -215,7 +220,8 @@
             {
                 if (Input.touchCount > 0 || Input.GetMouseButtonDown(0))
                 {
-                    LoadScene(menuScene, AppState.Menu);
+                    bool showLoading = !string.IsNullOrWhiteSpace(landingScene) ? true : false;
+                    LoadScene(menuScene, AppState.Menu, showLoading);
                 }
             }
 
