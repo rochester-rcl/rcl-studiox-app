@@ -10,14 +10,18 @@ namespace StudioX
     public class MenuButtonHandlerEditorLayout : Editor
     {
         SerializedProperty sceneName;
+        SerializedProperty isVR;
         [SerializeField]
         private UnityEngine.Object sceneObj;
+        [SerializeField]
+        private bool vrState;
         private string EditorPrefsKey;
         private string EditorPrefsKeyPrefix = "MenuButtonHander_";
-        // TODO persist the object id
+
         void OnEnable()
         {
             sceneName = serializedObject.FindProperty("sceneName");
+            isVR = serializedObject.FindProperty("isVR");
             EditorPrefsKey = string.Format("{0}{1}", EditorPrefsKeyPrefix, serializedObject.targetObject.name);
             LoadPrefs();
         }
@@ -27,6 +31,8 @@ namespace StudioX
             serializedObject.Update();
             sceneObj = EditorGUILayout.ObjectField("Scene", sceneObj, typeof(SceneAsset), false);
             sceneName.stringValue = sceneObj ? sceneObj.name : null;
+            vrState = EditorGUILayout.Toggle("VR Scene", vrState);
+            isVR.boolValue = vrState;
             serializedObject.ApplyModifiedProperties();
         }
 

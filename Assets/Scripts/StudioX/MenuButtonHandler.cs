@@ -9,6 +9,7 @@ namespace StudioX
     {
         public Button MenuButton { get; set; }
         public string sceneName;
+        public bool isVR = false;
         private AppManager Manager { get; set; }
         public void Start()
         {
@@ -29,10 +30,15 @@ namespace StudioX
         }
         public void ClickHandler()
         {
-            Debug.Log(sceneName);
             if (Manager)
             {
-                Manager.LoadScene(sceneName);
+                if (!isVR)
+                {
+                    Manager.LoadScene(sceneName);
+                } else 
+                {
+                    Manager.LoadVRScene(sceneName);
+                }
             }
         }
     }

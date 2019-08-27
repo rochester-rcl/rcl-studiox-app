@@ -6,6 +6,7 @@
     using System;
     using UnityEngine;
     using UnityEngine.SceneManagement;
+    using UnityEngine.XR;
     using System.Text.RegularExpressions;
 
 
@@ -19,8 +20,10 @@
         private Version MinFirebaseSdkVersion = new Version("6.3.0");
         private const string _sdkNotFoundVersion = "0.0.0";
         private FullscreenFade FadeController { get; set; }
-        private enum AppState { Loading, Landing, Menu, Default };
+        private enum AppState { Loading, Landing, Menu, VR, Default };
         private AppState CurrentAppState { get; set; }
+        // TODO make this a property to set cardboard or daydream
+        private const string VRDevice = "cardboard";
         public static string FirebaseSdkDir { get; set; }
         public Version FirebaseSdkVersion { get; set; }
         public string landingScene;
@@ -128,7 +131,7 @@
                 fade = ToggleLoadingScreen(true);
                 yield return fade;
             }
-            
+
             AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
             op.allowSceneActivation = false;
             while (!op.isDone)
@@ -147,6 +150,11 @@
 
         private IEnumerator LoadAsyncScene(string sceneName, bool showLoadingScreen = true)
         {
+            if (CurrentAppState == AppState.VR)
+            {
+                Coroutine enable2D = StartCoroutine(Enable2D());
+                yield return enable2D;
+            }
             CurrentAppState = AppState.Loading;
             Coroutine loader = StartCoroutine(LoadAsyncSceneInternal(sceneName, showLoadingScreen));
             yield return loader;
@@ -155,6 +163,11 @@
 
         private IEnumerator LoadAsyncScene(string sceneName, AppState end, bool showLoadingScreen = true)
         {
+            if (CurrentAppState == AppState.VR)
+            {
+                Coroutine enable2D = StartCoroutine(Enable2D());
+                yield return enable2D;
+            }
             CurrentAppState = AppState.Loading;
             Coroutine loader = StartCoroutine(LoadAsyncSceneInternal(sceneName, showLoadingScreen));
             yield return loader;
@@ -169,6 +182,49 @@
         private void LoadScene(string sceneName, AppState end, bool showLoadingScreen = true)
         {
             StartCoroutine(LoadAsyncScene(sceneName, end, showLoadingScreen));
+        }
+
+        public void LoadVRScene(string sceneName)
+        {
+            StartCoroutine(LoadAsyncVRScene(sceneName));
+        }
+
+        private IEnumerator LoadAsyncVRScene(string sceneName)
+        {
+            Coroutine coroutine = StartCoroutine(LoadAsyncScene(sceneName, AppState.VR));
+            yield return coroutine;
+            coroutine = StartCoroutine(EnableVR());
+            yield return coroutine;
+        }
+
+        private IEnumerator EnableVR()
+        {
+            if (string.Compare(XRSettings.loadedDeviceName, VRDevice, true) != 0)
+            {
+                XRSettings.LoadDeviceByName(VRDevice);
+                yield return null;
+            }
+            XRSettings.enabled = true;
+        }
+
+        private IEnumerator Enable2D()
+        {
+            XRSettings.LoadDeviceByName("");
+            yield return null;
+            ResetCameras();
+        }
+
+        private void ResetCameras()
+        {
+            for (int i = 0; i < Camera.allCameras.Length; i++)
+            {
+                Camera cam = Camera.allCameras[i];
+                if (cam.enabled && cam.stereoTargetEye != StereoTargetEyeMask.None)
+                {
+                    cam.transform.localPosition = Vector3.zero;
+                    cam.transform.localRotation = Quaternion.identity;
+                } 
+            }
         }
 
         private IEnumerator FadeAsync(bool fadeIn, bool updateSortOrder = false)
@@ -225,9 +281,9 @@
                 }
             }
 
-            if (CurrentAppState == AppState.Default)
+            if (CurrentAppState == AppState.Default || CurrentAppState == AppState.VR)
             {
-                if (Input.GetKey(KeyCode.Escape))
+                if (Input.GetKeyDown(KeyCode.Escape))
                 {
                     LoadScene(menuScene, AppState.Menu);
                 }
