@@ -139,6 +139,11 @@ namespace GetSocialSdk.Capture.Scripts
             }
         }
 
+        public string getResultFilePath()
+        {
+            return _resultFilePath;
+        }
+
         #endregion
 
         #region Unity methods
@@ -189,7 +194,7 @@ namespace GetSocialSdk.Capture.Scripts
         {
             _captureId = Guid.NewGuid().ToString();
             
-            var fileName = string.Format("result-{0}.gif", _captureId);
+            var fileName = string.Format("result{0}.gif", _captureId);
             _resultFilePath = GetResultDirectory() + Path.DirectorySeparatorChar + fileName;
             Debug.Log("rs path: " + _resultFilePath);
             StoreWorker.Instance.Start(ThreadPriority.BelowNormal, maxCapturedFrames);

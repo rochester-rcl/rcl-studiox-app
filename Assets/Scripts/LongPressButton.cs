@@ -38,6 +38,7 @@ public class LongPressButton : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             if (pointerDownTimer > minHoldTime && !recordingController.isControllerRecording())//if past the threshold for gif and if controller isnt already recording.
             {
                 recordingController.PingRecording();//start recording.
+                //recordingController.StartRecording();
             }
 
             pointerDownTimer += Time.deltaTime;
@@ -85,6 +86,7 @@ public class LongPressButton : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             //clean up gif capture
             Debug.Log("Create gif");
             recordingController.PingRecording();//stop recording.
+            //recordingController.StartRecording();
             if (recordingController.isControllerRecording())//shouldnt be recording.
             {
                 Debug.Log("--------- out of sync ---------");

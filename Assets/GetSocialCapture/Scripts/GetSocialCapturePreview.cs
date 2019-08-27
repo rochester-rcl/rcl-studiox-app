@@ -120,6 +120,11 @@ namespace GetSocialSdk.Capture.Scripts
             }
         }
 
+        public List<Texture2D> getFramesToPlay()
+        {
+            return _framesToPlay;
+        }
+
         #endregion
 
     }

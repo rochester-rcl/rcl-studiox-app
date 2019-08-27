@@ -1,15 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GetSocialSdk.Capture.Scripts;
 using UnityEngine;
 using UnityEngine.UI;
+using System.IO;
 
 public class RecordingController : MonoBehaviour
 {
+
     [SerializeField]
     private GetSocialCapturePreview capturePreview;
     [SerializeField]
     private GetSocialCapture _capture;
+
+    [SerializeField]
+    private Camera _camera;
+    [SerializeField]
+    private RawImage _preview;
 
     //Buttons
     [SerializeField]
@@ -27,7 +35,16 @@ public class RecordingController : MonoBehaviour
     private bool off = false;
     private bool on = true;
 
-	void Awake()
+    bool tookPhoto = false;
+    bool tookVideo = false;
+
+    private byte[] stillImageResult;
+
+
+    bool inAlbum = false;
+
+
+    void Awake()
 	{
         _capture.captureMode = GetSocialCapture.GetSocialCaptureMode.Continuous;
 	}
@@ -36,33 +53,112 @@ public class RecordingController : MonoBehaviour
 	void Start()
     {
 
+        _preview.color = Color.clear;
+        _preview.texture = null;
+    
         enableReadyToRecordState(true);
 
         isRecording = false;
        // _capture.StartCapture();
     }
 
+    void Update()
+    {
+		//if (screenRecorder.isVideoSaved() && !inAlbum)
+		//{
+		//	// byte[] rawFrames = screenRecorder.getRawFrames();
+		//	byte[] rf = File.ReadAllBytes(screenRecorder.getPath());
+		//	NativeGallery.SaveVideoToGallery(rf, "album", "rawtestVideo.mov", null);
+
+		//	//NativeGallery.SaveVideoToGallery(screenRecorder.getPath(), "album2", "testVideo.bmp", null);
+		//	Debug.Log("saved video to gallery");
+		//	inAlbum = true;
+		//}
+	}
+
     public void TakeStillImage()
     {
-        Debug.Log("Take still image");
+        int resWidth = Screen.width;
+        int resHeight = Screen.height;
+
+        Debug.Log("Take still image with res (" + resWidth + ", " + resHeight + ")");
+
+        RenderTexture rt = new RenderTexture(resWidth, resHeight, 24);
+        _camera.targetTexture = rt;
+        Texture2D screenShot = new Texture2D(resWidth, resHeight, TextureFormat.RGB24,false);
+        _camera.Render();
+        RenderTexture.active = rt;
+        screenShot.ReadPixels(new Rect(0, 0, resWidth, resHeight), 0, 0);
+        _camera.targetTexture = null;
+        RenderTexture.active = null;
+        Destroy(rt);
+
+        _preview.texture = screenShot;
+        stillImageResult = screenShot.EncodeToPNG();
+
+        Debug.Log("done taking photo");
 
         enableReadyToRecordState(false);
-
+        tookPhoto = true;
     }
 
     public void SaveResult()
     {
-        Debug.Log("starting gif generation");
-        Action<byte[]> result = bytes =>
-        {
 
-        };
-        _capture.GenerateCapture(result);
+        if (tookPhoto && stillImageResult != null)
+        {
+            string filename = "test.png";
+            NativeGallery.SaveImageToGallery(stillImageResult, "album", filename, null);
+
+            Debug.Log("saved photo");
+
+            tookPhoto = false;
+
+            //stillImageResult = null;
+
+        } else if (tookVideo)
+        {
+		
+            //List<Texture2D> gifFrames = capturePreview.getFramesToPlay();
+            //         List<byte> unrolled_frames_list = new List<byte>();
+            //         for (int i = 0; i < gifFrames.Count; i++)
+            //         {
+            //             byte[] rgf = gifFrames[i].GetRawTextureData();
+
+            //             for (int j =0; j < rgf.Length; j++)
+            //             {
+            //                 unrolled_frames_list.Add(rgf[j]);
+            //             }
+
+            //         }
+            //         byte[] all_rgf = unrolled_frames_list.ToArray();
+
+
+            //         for (int i = 0; i < gifFrames.Count; i++)
+            //{
+            //             byte[] rgf = gifFrames[i].GetRawTextureData();
+
+            //}
+
+            string read_from_path = _capture.getResultFilePath();
+
+            NativeGallery.SaveVideoToGallery(read_from_path, "album", "rawtestVideo1.gif", null);
+			Debug.Log("saved video");
+			tookVideo = false;
+        } else
+        {
+            Debug.Log("no data to save");
+        }
+
     }
 
     public void CancelResult()
     {
-        capturePreview.Stop();
+         capturePreview.Stop();
+        Destroy(_preview.texture);
+
+        _preview.texture = null;
+        _preview.color = Color.clear;
 
         enableReadyToRecordState(true);
     }
@@ -74,6 +170,7 @@ public class RecordingController : MonoBehaviour
             Debug.Log("recording started");
             _capture.StartCapture();
             isRecording = true;
+			tookVideo = true;
         } else{
             StopRecording();
             isRecording = false;
@@ -85,14 +182,29 @@ public class RecordingController : MonoBehaviour
     //    Debug.Log("recording controller ping");
     //}
 
+    public void StartRecording()
+    {
+        //screenRecorder.recordVideo = true;
+        isRecording = true;
+
+    }
 
     private void StopRecording()
     {
         Debug.Log("recording stopped");
 
         _capture.StopCapture();
-        capturePreview.Play();
+        Debug.Log("starting gif generation");
+        Action<byte[]> result = bytes =>
+        {
+            // generated gif returned as byte[]
 
+            //byte[] gifContent = result.ToArray();
+        };
+        _capture.GenerateCapture(result);
+        Debug.Log("generated gif");
+        capturePreview.Play();
+        Debug.Log("after preview play");
         enableReadyToRecordState(false);
 
     }
