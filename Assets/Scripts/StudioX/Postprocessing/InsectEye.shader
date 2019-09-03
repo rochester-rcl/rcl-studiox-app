@@ -88,15 +88,23 @@ Shader "Hidden/Custom/InsectEye"
             return lerp(color, _HexColor, hex * _Blend);
         }
 
+        float2 rotate2d(float2 v, float a)
+        {
+            float s = sin(a);
+            float c = cos(a);
+            float2x2 rotation = float2x2(c, -s, s, c);
+            return mul(rotation, v);
+        }
+
         float4 FragWithSampling(VaryingsDefault i): SV_Target
         {
             float s = _ScreenParams.x / 80.0;
-            float2 nearest = NearestHex(s, i.texcoordStereo * _ScreenParams.xy);
-            float4 texel = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, nearest / _ScreenParams.xy);
-            float hex = Hex(i.vertex.xy) * 0.5;
-            float dist = HexDistance(i.vertex.yx, nearest);
-            float interior = 1.0 - smoothstep(s-1.0, s, hex);
-            return texel;
+            float2 nearest = NearestHex(s, rotate2d(i.vertex.xy, 1.5708));
+            
+            float4 texel = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, nearest.xy / _ScreenParams.xy);
+            float dist = HexDistance(i.vertex.xy, nearest);
+            float interior = 1.0 - smoothstep(s - 1.0, s, dist);
+            return float4(texel.rgb, 1.0);
             // return float4(dist, dist, dist, dist);
             //return float4(dist, dist, dist, 1.0);
             /*float4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord);
@@ -113,8 +121,8 @@ Shader "Hidden/Custom/InsectEye"
         {
             HLSLPROGRAM
                 #pragma vertex VertDefault
-                // #pragma fragment Frag
-                #pragma fragment FragWithSampling
+                #pragma fragment Frag
+                // #pragma fragment FragWithSampling
             ENDHLSL
         }
     }
