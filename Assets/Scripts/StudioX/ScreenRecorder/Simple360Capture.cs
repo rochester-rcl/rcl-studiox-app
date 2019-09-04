@@ -17,13 +17,14 @@ namespace StudioX
             public int duration;
             public bool startCaptureOnStart = true;
             public string imagePrefix;
+            public string imageFolder;
             private Texture2D OutTex { get; set; }
             private CubemapFace[] CubemapFaces = { CubemapFace.PositiveX, CubemapFace.NegativeX,
             CubemapFace.PositiveY, CubemapFace.NegativeY,
             CubemapFace.PositiveZ, CubemapFace.NegativeZ };
             private int framesCaptured;
             private int totalFrames;
-            private string imagesDir;
+           
             private Camera cam;
             private GameObject progress;
             private Text progressText;
@@ -36,7 +37,10 @@ namespace StudioX
                 cam.cullingMask = ~(1 << 5);
                 framesCaptured = 0;
                 totalFrames = duration * targetFramerate;
-                imagesDir = FindRecordingsDir();
+                if (string.IsNullOrWhiteSpace(imageFolder))
+                {
+                    imageFolder = FindRecordingsDir();
+                }
                 tex = new Cubemap(cubemapSize, TextureFormat.RGBA32, false);
                 tex.anisoLevel = 9;
                 OutTex = new Texture2D(tex.width, tex.height * 6, TextureFormat.RGBA32, false);
@@ -45,7 +49,6 @@ namespace StudioX
                 {
                     StartRecording();
                 }
-
             }
 
             private void InitCanvas()
@@ -136,19 +139,13 @@ namespace StudioX
                 {
                     CubemapToBitmapLayout();
                     byte[] OutBuffer = OutTex.EncodeToPNG();
-                    string outPath = string.Format("{0}/{1}{2:D6}.png", imagesDir, imagePrefix, framesCaptured);
+                    string outPath = string.Format("{0}/{1}{2:D6}.png", imageFolder, imagePrefix, framesCaptured);
                     WriteFileAsync(OutBuffer, outPath);
                 }
             }
 
             private async void WriteFileAsync(byte[] buffer, string outPath)
             {
-                string parentDir = Path.GetDirectoryName(outPath);
-                if (!Directory.Exists(Path.GetDirectoryName(outPath)))
-                {
-                    Debug.Log(parentDir);
-                    Directory.CreateDirectory(parentDir);
-                }
                 using (FileStream fs = File.Open(outPath, FileMode.Create))
                 {
                     fs.Seek(0, SeekOrigin.End);
