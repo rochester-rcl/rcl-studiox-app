@@ -709,7 +709,7 @@ MonoBehaviour:
   targetFramerate: 30
   duration: 5
   startCaptureOnStart: 0
-  imagePrefix: "frame_\x13"
+  imagePrefix: "image_\x13"
   imageFolder: /media/jromphf/ExtraDrive11/application_data/video/unity-screen-recording
 --- !u!4 &2030025157
 Transform:
