@@ -36,7 +36,6 @@ namespace StudioX
                 cam.cullingMask = ~(1 << 5);
                 framesCaptured = 0;
                 totalFrames = duration * targetFramerate;
-                Application.targetFrameRate = targetFramerate;
                 imagesDir = FindRecordingsDir();
                 tex = new Cubemap(cubemapSize, TextureFormat.RGBA32, false);
                 tex.anisoLevel = 9;
@@ -44,8 +43,7 @@ namespace StudioX
                 InitCanvas();
                 if (startCaptureOnStart)
                 {
-                    recording = true;
-                    StartCoroutine(ExecRecording());
+                    StartRecording();
                 }
 
             }
@@ -100,19 +98,36 @@ namespace StudioX
                 OutTex.Apply();
             }
 
-            private IEnumerator ExecRecording()
+            private void StartRecording()
             {
                 recording = true;
                 progress.SetActive(true);
-                while (framesCaptured < totalFrames && recording)
-                {
-                    yield return new WaitForEndOfFrame();
-                    Capture();
-                }
+                Time.captureFramerate = targetFramerate;
+            }
+
+            private void StopRecording()
+            {
                 recording = false;
-                framesCaptured = 0;
                 progress.SetActive(false);
-                Debug.Log("DONE RECORDING");
+                Time.captureFramerate = 0;
+            }
+
+            private void HandleCapture()
+            {
+                if (recording)
+                {
+                    if (framesCaptured < totalFrames)
+                    {
+                        Capture();
+                        framesCaptured++;
+                        progressText.text = string.Format("Recorded {0} Frames / {1}", framesCaptured, totalFrames);
+                    }
+                    else
+                    {
+                        StopRecording();
+                        Debug.Log("DONE RECORDING");
+                    }
+                }
             }
 
             private void Capture()
@@ -123,8 +138,6 @@ namespace StudioX
                     byte[] OutBuffer = OutTex.EncodeToPNG();
                     string outPath = string.Format("{0}/{1}{2:D6}.png", imagesDir, imagePrefix, framesCaptured);
                     WriteFileAsync(OutBuffer, outPath);
-                    framesCaptured++;
-                    progressText.text = string.Format("Recorded {0} Frames / {1}", framesCaptured, totalFrames);
                 }
             }
 
@@ -133,6 +146,7 @@ namespace StudioX
                 string parentDir = Path.GetDirectoryName(outPath);
                 if (!Directory.Exists(Path.GetDirectoryName(outPath)))
                 {
+                    Debug.Log(parentDir);
                     Directory.CreateDirectory(parentDir);
                 }
                 using (FileStream fs = File.Open(outPath, FileMode.Create))
@@ -144,21 +158,18 @@ namespace StudioX
 
             void Update()
             {
-                if (!startCaptureOnStart)
+                if (Input.GetKeyDown("space"))
                 {
-                    if (Input.GetKeyDown("space"))
+                    if (recording)
                     {
-                        if (recording)
-                        {
-                            recording = false;
-                        }
-                        else
-                        {
-                            StartCoroutine(ExecRecording());
-                        }
-
+                        StopRecording();
+                    }
+                    else
+                    {
+                        StartRecording();
                     }
                 }
+                HandleCapture();
             }
         }
 #endif
