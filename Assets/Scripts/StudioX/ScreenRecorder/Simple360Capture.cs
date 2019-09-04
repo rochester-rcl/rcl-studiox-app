@@ -30,8 +30,8 @@ namespace StudioX
             private bool recording;
             void Start()
             {
-                cam = gameObject.AddComponent<Camera>();
-                cam.CopyFrom(Camera.main);
+                cam = Camera.main;
+                cam.tag = "Untagged";
                 // IGNORE UI LAYER
                 cam.cullingMask = ~(1 << 5);
                 framesCaptured = 0;
