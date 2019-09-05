@@ -706,7 +706,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cubemapSize: 1024
-  equirectangularWidth: 2048
+  equirectangularWidth: 4096
   targetFramerate: 30
   duration: 5
   startCaptureOnStart: 0

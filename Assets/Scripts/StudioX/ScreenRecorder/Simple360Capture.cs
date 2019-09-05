@@ -53,10 +53,10 @@ namespace StudioX
                     rt.dimension = TextureDimension.Cube;
                     rt.anisoLevel = 9;
                     rt.antiAliasing = 8;
-                    equirect = new RenderTexture(equirectangularWidth, equirectangularWidth * 2, 24, RenderTextureFormat.ARGB32);
+                    equirect = new RenderTexture(equirectangularWidth, equirectangularWidth / 2, 24, RenderTextureFormat.ARGB32);
                     equirect.anisoLevel = 9;
                     equirect.antiAliasing = 8;
-                    OutTex = new Texture2D(equirectangularWidth, equirectangularWidth * 2, TextureFormat.RGBA32, false);
+                    OutTex = new Texture2D(equirectangularWidth, equirectangularWidth / 2, TextureFormat.RGB24, false);
                     equirectangularArea = new Rect(0, 0, equirectangularWidth, equirectangularWidth * 2);
                     cam.stereoSeparation = 0f;
                 }
