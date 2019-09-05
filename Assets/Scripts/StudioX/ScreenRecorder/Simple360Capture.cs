@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Rendering;
 using System.IO;
 
 namespace StudioX
@@ -12,10 +13,14 @@ namespace StudioX
         public class Simple360Capture : MonoBehaviour
         {
             private Cubemap tex;
+            private RenderTexture rt;
+            private RenderTexture equirect;
             public int cubemapSize = 512;
+            public int equirectangularWidth = 2048;
             public int targetFramerate = 30;
             public int duration;
             public bool startCaptureOnStart = true;
+            public bool exportEquirectangular;
             public string imagePrefix;
             public string imageFolder;
             private Texture2D OutTex { get; set; }
@@ -24,11 +29,12 @@ namespace StudioX
             CubemapFace.PositiveZ, CubemapFace.NegativeZ };
             private int framesCaptured;
             private int totalFrames;
-           
+
             private Camera cam;
             private GameObject progress;
             private Text progressText;
             private bool recording;
+            private Rect equirectangularArea;
             void Start()
             {
                 cam = Camera.main;
@@ -41,9 +47,27 @@ namespace StudioX
                 {
                     imageFolder = FindRecordingsDir();
                 }
-                tex = new Cubemap(cubemapSize, TextureFormat.RGBA32, false);
-                tex.anisoLevel = 9;
-                OutTex = new Texture2D(tex.width, tex.height * 6, TextureFormat.RGBA32, false);
+                if (exportEquirectangular)
+                {
+                    rt = new RenderTexture(cubemapSize, cubemapSize, 24, RenderTextureFormat.ARGB32);
+                    rt.dimension = TextureDimension.Cube;
+                    rt.anisoLevel = 9;
+                    rt.antiAliasing = 8;
+                    equirect = new RenderTexture(equirectangularWidth, equirectangularWidth * 2, 24, RenderTextureFormat.ARGB32);
+                    equirect.anisoLevel = 9;
+                    equirect.antiAliasing = 8;
+                    OutTex = new Texture2D(equirectangularWidth, equirectangularWidth * 2, TextureFormat.RGBA32, false);
+                    equirectangularArea = new Rect(0, 0, equirectangularWidth, equirectangularWidth * 2);
+                    cam.stereoSeparation = 0f;
+                }
+                else
+                {
+                    tex = new Cubemap(cubemapSize, TextureFormat.RGBA32, false);
+                    tex.anisoLevel = 9;
+                    OutTex = new Texture2D(tex.width, tex.height * 6, TextureFormat.RGBA32, false);
+                }
+
+               
                 InitCanvas();
                 if (startCaptureOnStart)
                 {
@@ -102,6 +126,17 @@ namespace StudioX
                 OutTex.Apply();
             }
 
+            private void CubemapToEquirectangular()
+            {
+                cam.RenderToCubemap(rt, 63, Camera.MonoOrStereoscopicEye.Left);
+                rt.ConvertToEquirect(equirect, Camera.MonoOrStereoscopicEye.Mono);
+                RenderTexture oldActive = RenderTexture.active;
+                RenderTexture.active = equirect;
+                OutTex.ReadPixels(equirectangularArea, 0, 0);
+                OutTex.Apply();
+                RenderTexture.active = oldActive;
+            }
+
             private void StartRecording()
             {
                 recording = true;
@@ -138,7 +173,14 @@ namespace StudioX
             {
                 if (cam)
                 {
-                    CubemapToBitmapLayout();
+                    if (exportEquirectangular)
+                    {
+                        CubemapToEquirectangular();
+                    }
+                    else
+                    {
+                        CubemapToBitmapLayout();
+                    }
                     byte[] OutBuffer = OutTex.EncodeToPNG();
                     string outPath = string.Format("{0}/{1}{2:D6}.png", imageFolder, imagePrefix, framesCaptured);
                     WriteFileAsync(OutBuffer, outPath);

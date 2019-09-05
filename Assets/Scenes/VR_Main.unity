@@ -705,10 +705,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9aec96187610b25dea977dc415e880c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cubemapSize: 512
+  cubemapSize: 1024
+  equirectangularWidth: 2048
   targetFramerate: 30
   duration: 5
   startCaptureOnStart: 0
+  exportEquirectangular: 1
   imagePrefix: "image_\x13"
   imageFolder: /media/jromphf/ExtraDrive11/application_data/video/unity-screen-recording
 --- !u!4 &2030025157

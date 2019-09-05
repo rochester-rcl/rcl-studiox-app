@@ -17,13 +17,16 @@ namespace StudioX
             SerializedProperty startCaptureOnStart;
             SerializedProperty imagePrefix;
             SerializedProperty imageFolder;
-
+            SerializedProperty exportEquirectangular;
+            SerializedProperty equirectangularWidth;
             void OnEnable()
             {
                 cubemapSize = serializedObject.FindProperty("cubemapSize");
                 targetFramerate = serializedObject.FindProperty("targetFramerate");
                 duration = serializedObject.FindProperty("duration");
                 startCaptureOnStart = serializedObject.FindProperty("startCaptureOnStart");
+                exportEquirectangular = serializedObject.FindProperty("exportEquirectangular");
+                equirectangularWidth = serializedObject.FindProperty("equirectangularWidth");
                 imagePrefix = serializedObject.FindProperty("imagePrefix");
                 imageFolder = serializedObject.FindProperty("imageFolder");
             }
@@ -35,6 +38,11 @@ namespace StudioX
                 EditorGUILayout.PropertyField(targetFramerate);
                 EditorGUILayout.PropertyField(duration);
                 EditorGUILayout.PropertyField(startCaptureOnStart);
+                EditorGUILayout.PropertyField(exportEquirectangular);
+                if (exportEquirectangular.boolValue)
+                {
+                    EditorGUILayout.PropertyField(equirectangularWidth);
+                }
                 EditorGUILayout.PropertyField(imagePrefix);
                 GUILayout.BeginHorizontal();
                 {
