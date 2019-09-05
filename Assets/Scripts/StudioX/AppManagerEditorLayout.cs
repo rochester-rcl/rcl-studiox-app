@@ -10,47 +10,33 @@ namespace StudioX
     public class AppManagerEditorLayout : Editor
     {
         SerializedProperty landingScene;
-        [SerializeField]
-        private UnityEngine.Object landingSceneObj;
+        private SceneAsset landingSceneObj;
         SerializedProperty loadingScreen;
         SerializedProperty menuScene;
-        [SerializeField]
-        private UnityEngine.Object menuSceneObj;
+        private SceneAsset menuSceneObj;
         SerializedProperty firebaseMessagingTopic;
-        [SerializeField]
-        private string messagingTopic;
         private const string EditorPrefsKey = "AppManagerEditorLayoutKey";
-        void OnEnable()
+        public void OnEnable()
         {
             landingScene = serializedObject.FindProperty("landingScene");
-            Debug.Log(landingScene.stringValue);
+            landingSceneObj = LoadSceneAsset(landingScene.stringValue);
             loadingScreen = serializedObject.FindProperty("loadingScreen");
             menuScene = serializedObject.FindProperty("menuScene");
+            menuSceneObj = LoadSceneAsset(menuScene.stringValue);
             firebaseMessagingTopic = serializedObject.FindProperty("firebaseMessagingTopic");
-            LoadPrefs();
         }
 
-        private void SavePrefs()
+        private SceneAsset LoadSceneAsset(string sceneName)
         {
-            string data = JsonUtility.ToJson(this, false);
-            if (!string.IsNullOrEmpty(data))
+            string[] scenes = AssetDatabase.FindAssets(sceneName);
+            if (scenes.Length > 0)
             {
-                EditorPrefs.SetString(EditorPrefsKey, data);
+                return AssetDatabase.LoadAssetAtPath<SceneAsset>(AssetDatabase.GUIDToAssetPath(scenes[0]));
             }
-        }
-
-        private void LoadPrefs()
-        {
-            string data = EditorPrefs.GetString(EditorPrefsKey, JsonUtility.ToJson(this, false));
-            if (!string.IsNullOrEmpty(data))
+            else
             {
-                JsonUtility.FromJsonOverwrite(data, this);
+                return null;
             }
-        }
-
-        void OnDisable()
-        {
-            SavePrefs();
         }
 
         public override void OnInspectorGUI()
@@ -58,7 +44,7 @@ namespace StudioX
             serializedObject.Update();
 
             /*** LANDING SCENE ***/
-            landingSceneObj = EditorGUILayout.ObjectField("Landing Scene", landingSceneObj, typeof(SceneAsset), false);
+            landingSceneObj = EditorGUILayout.ObjectField("Landing Scene", landingSceneObj, typeof(SceneAsset), false) as SceneAsset;
             if (landingSceneObj)
             {
                 landingScene.stringValue = landingSceneObj.name;
@@ -72,7 +58,7 @@ namespace StudioX
             EditorGUILayout.PropertyField(loadingScreen);
 
             /*** MENU SCENE ***/
-            menuSceneObj = EditorGUILayout.ObjectField("Menu Scene", menuSceneObj, typeof(SceneAsset), true);
+            menuSceneObj = EditorGUILayout.ObjectField("Menu Scene", menuSceneObj, typeof(SceneAsset), true) as SceneAsset;
             if (menuSceneObj)
             {
                 menuScene.stringValue = menuSceneObj.name;
@@ -82,9 +68,7 @@ namespace StudioX
                 menuScene.stringValue = null;
             }
 
-            // Also circumvent the odd control character bug
-            messagingTopic = EditorGUILayout.TextField("Firebase Messaging Topic", messagingTopic);
-            firebaseMessagingTopic.stringValue = messagingTopic;
+            firebaseMessagingTopic.stringValue = EditorGUILayout.TextField("Firebase Messaging Topic", firebaseMessagingTopic.stringValue);
 
             serializedObject.ApplyModifiedProperties();
         }

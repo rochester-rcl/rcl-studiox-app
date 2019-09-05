@@ -17,7 +17,6 @@ namespace StudioX
             SerializedProperty startCaptureOnStart;
             SerializedProperty imagePrefix;
             SerializedProperty imageFolder;
-            private string EditorPrefsKey = "Simple360Capture";
 
             void OnEnable()
             {
@@ -27,7 +26,6 @@ namespace StudioX
                 startCaptureOnStart = serializedObject.FindProperty("startCaptureOnStart");
                 imagePrefix = serializedObject.FindProperty("imagePrefix");
                 imageFolder = serializedObject.FindProperty("imageFolder");
-                LoadPrefs();
             }
 
             public override void OnInspectorGUI()
@@ -48,29 +46,6 @@ namespace StudioX
                 }
                 GUILayout.EndHorizontal();
                 serializedObject.ApplyModifiedProperties();
-            }
-
-            void OnDisable()
-            {
-                SavePrefs();
-            }
-
-            private void SavePrefs()
-            {
-                string data = JsonUtility.ToJson(this, false);
-                if (!string.IsNullOrEmpty(data))
-                {
-                    EditorPrefs.SetString(EditorPrefsKey, data);
-                }
-            }
-
-            private void LoadPrefs()
-            {
-                string data = EditorPrefs.GetString(EditorPrefsKey, JsonUtility.ToJson(this, false));
-                if (!string.IsNullOrEmpty(data))
-                {
-                    JsonUtility.FromJsonOverwrite(data, this);
-                }
             }
         }
     }

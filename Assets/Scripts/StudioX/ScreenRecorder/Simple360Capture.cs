@@ -83,6 +83,7 @@ namespace StudioX
             private void CubemapToBitmapLayout()
             {
                 cam.RenderToCubemap(tex, 63);
+                tex.SmoothEdges();
                 Unity.Collections.NativeArray<Color32> rawData = OutTex.GetRawTextureData<Color32>();
                 int index = 0;
                 for (int i = CubemapFaces.Length; i > 0; --i)
