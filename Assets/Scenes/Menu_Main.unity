@@ -579,6 +579,7 @@ GameObject:
   - component: {fileID: 261964458}
   - component: {fileID: 261964457}
   - component: {fileID: 261964456}
+  - component: {fileID: 261964455}
   m_Layer: 5
   m_Name: SelectARButton
   m_TagString: Untagged
@@ -606,6 +607,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 500, y: 100}
   m_Pivot: {x: 0, y: 1}
+--- !u!114 &261964455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 261964453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aef25e103d8e11608862e8636584ead5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneName: AR_Dummy_Main
+  isVR: 0
 --- !u!114 &261964456
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -918,7 +933,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aef25e103d8e11608862e8636584ead5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneName: 
+  sceneName: AR_Dummy_Main
   isVR: 0
 --- !u!1 &373084184
 GameObject:
