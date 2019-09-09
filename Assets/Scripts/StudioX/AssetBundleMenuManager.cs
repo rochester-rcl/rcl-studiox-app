@@ -1,19 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 namespace StudioX
 {
     public class AssetBundleMenuManager : MonoBehaviour
     {
-        public AssetBundle[] Bundles { get; set; }
+        public List<AssetBundle> Bundles { get; set; }
         public GameObject menuPortrait;
         public GameObject menuLandscape;
+        public GameObject scrollViewPortrait;
+        public GameObject scrollViewLandscape;
         private int currentMenuId;
         public enum MenuOrientation { Lanscape, Portrait };
         private static readonly object managerLock = new object();
         private static AssetBundleMenuManager _instance;
-        private List<GameObject> cells;
+        private AppManager Manager { get; set; }
+        private Transform scrollViewPortraitContainer;
+        private Transform scrollViewLandscapeContainer;
         // TODO figure out how best to load display images from the bundle as well as their names
 
         ///<summary>Static thread-safe singleton instance of AssetBundleMenuManager</summary>
@@ -43,34 +47,72 @@ namespace StudioX
 
         public void Start()
         {
+            Manager = AppManager.GetManager();
+            if (!Manager)
+            {
+                Debug.LogError("There must be an instance of AppManager attached to a GameObject in the scene");
+            }
+            else
+            {
+                Bundles = Manager.ARBundles;
+            }
             InitMenuLandscape();
             InitMenuPortrait();
+            StartCoroutine(InitCells());
         }
-
+        // TODO add animated loader while this runs
         private IEnumerator InitCells()
         {
-            foreach(AssetBundle bundle in Bundles)
+            GameObject[] localAssets;
+            if (Bundles.Count > 0)
             {
-
+                foreach (AssetBundle b in Bundles)
+                {
+                    AssetBundleRequest req = b.LoadAllAssetsAsync<GameObject>();
+                    yield return req;
+                    localAssets = req.allAssets as GameObject[];
+                    foreach (GameObject asset in localAssets)
+                    {
+                        AddGameObjectToMenu(true, asset);
+                        AddGameObjectToMenu(false, asset);
+                    }
+                }
             }
+            yield return null;
         }
 
-        private IEnumerator PopulateCellData(ref AssetBundle bundle)
+        private void AddGameObjectToMenu(bool isLandscape, GameObject go)
         {
-            Sprite displayImage bundle.LoadAsset<Sprite>("Assets/") 
+            Instantiate(go, new Vector3(0, 0, 0), Quaternion.identity);
+            if (isLandscape)
+            {
+                go.transform.parent = scrollViewLandscapeContainer;
+            }
+            else
+            {
+                go.transform.parent = scrollViewPortraitContainer;
+            }
         }
 
         // We may be able to get away with the same layout if we use a GridLayout ... 
         private void InitMenuPortrait()
         {
             CheckMenuForCanvas(ref menuPortrait);
-            GridLayout layout = menuPortrait.AddComponent<GridLayout>();
-
+            scrollViewPortraitContainer = scrollViewPortrait.transform.Find("Viewport/Content");
+            if (!scrollViewPortraitContainer)
+            {
+                throw new MissingComponentException(string.Format("A ScrollView Component is required on {0}", scrollViewPortrait.name));
+            }
         }
 
         private void InitMenuLandscape()
         {
-            CheckMenuForCanvas(ref menuPortrait);
+            CheckMenuForCanvas(ref menuLandscape);
+            scrollViewLandscapeContainer = scrollViewLandscape.transform.Find("Viewport/Content");
+            if (!scrollViewLandscapeContainer)
+            {
+                throw new MissingComponentException(string.Format("A ScrollView Component is required on {0}", scrollViewLandscape.name));
+            }
         }
 
         private void CheckMenuForCanvas(ref GameObject go)

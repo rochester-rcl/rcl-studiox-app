@@ -8,7 +8,7 @@
     using UnityEngine.SceneManagement;
     using UnityEngine.XR;
     using System.Text.RegularExpressions;
-
+    using System.IO;
 
     ///<summary>Singleton class to be used to manage scene changes, Firebase support, and any other housekeeping</summary>
     public class AppManager : MonoBehaviour
@@ -24,12 +24,15 @@
         private AppState CurrentAppState { get; set; }
         // TODO make this a property to set cardboard or daydream
         private const string VRDevice = "cardboard";
+        // TODO THESE WILL BE REPLACED WITH REMOTE ASSET BUNDLES
+        private string[] arBundleNames = {"groundboibundle.unity3d", "foxyboibundle.unity3d"};
         public static string FirebaseSdkDir { get; set; }
         public Version FirebaseSdkVersion { get; set; }
         public string landingScene;
         public int landingDuration = 3;
         public GameObject loadingScreen;
         public string menuScene;
+        public List<AssetBundle> ARBundles { get; set; }
 
         ///<summary>The optional name of the Firebase Messaging Topic the app will subscribe to.false Defaults to an empty string.
         ///<para><see cref="Firebase.Messaging.FirebaseMessaging.SubscribeAsync(string)"/> for more details</para> 	
@@ -58,6 +61,7 @@
             InitLoadingScreen();
             InitFirebase();
             DisplayLanding();
+            StartCoroutine(LoadLocalAssetBundles());
         }
 
         public void InitLoadingScreen()
@@ -146,6 +150,20 @@
             }
             Coroutine fadeIn = StartCoroutine(FadeAsync(true));
             yield return fadeIn;
+        }
+
+        private IEnumerator LoadLocalAssetBundles()
+        {
+            ARBundles = new List<AssetBundle>();
+            // I wonder if this has to be done on the main thread or if they can be done in parallel
+            foreach(string bundlePath in arBundleNames)
+            {
+                string absPath = Path.Combine(Application.streamingAssetsPath, bundlePath);
+                var bundleRequest = AssetBundle.LoadFromFileAsync(absPath);
+                yield return bundleRequest;
+                AssetBundle b = bundleRequest.assetBundle;
+                if (b) ARBundles.Add(b);
+            }
         }
 
         private IEnumerator LoadAsyncScene(string sceneName, bool showLoadingScreen = true)
