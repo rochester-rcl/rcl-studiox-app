@@ -1499,7 +1499,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneName: VR_Main
-  isVR: 0
+  isVR: 1
 --- !u!1 &720197846
 GameObject:
   m_ObjectHideFlags: 0
@@ -1770,7 +1770,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneName: VR_Main
-  isVR: 0
+  isVR: 1
 --- !u!114 &901066621
 MonoBehaviour:
   m_ObjectHideFlags: 0
