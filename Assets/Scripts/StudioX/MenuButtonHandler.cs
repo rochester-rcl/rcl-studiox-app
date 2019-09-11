@@ -13,7 +13,7 @@ namespace StudioX
         private AppManager Manager { get; set; }
         public void Start()
         {
-            MenuButton = GetComponent<Button>() as Button;
+            MenuButton = GetComponent<Button>();
             Manager = AppManager.GetManager();
             if (!Manager)
             {

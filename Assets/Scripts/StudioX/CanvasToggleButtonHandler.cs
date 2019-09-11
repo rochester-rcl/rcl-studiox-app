@@ -25,14 +25,12 @@ namespace StudioX
         public void OpenHandler()
         {
             targetCanvas.SetActive(true);
-            openButtonObject.SetActive(false);
             closeButtonObject.SetActive(true);
         }
 
         public void CloseHandler()
         {
             targetCanvas.SetActive(false);
-            openButtonObject.SetActive(true);
             closeButtonObject.SetActive(false);
         }
     }

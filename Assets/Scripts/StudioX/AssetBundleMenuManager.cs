@@ -9,21 +9,18 @@ namespace StudioX
     public class AssetBundleMenuManager : MonoBehaviour
     {
         public List<AssetBundle> Bundles { get; set; }
-        public GameObject menuPortrait;
-        public GameObject menuLandscape;
-        public GameObject scrollViewPortrait;
-        public GameObject scrollViewLandscape;
+        public GameObject menu;
+        public GameObject scrollView;
         public GameObject toggleButton;
         public string uiAssetPrefix = "ui_";
         public GameObject CurrentMesh { get; set; }
         private int currentMenuId;
-        public enum MenuOrientation { Lanscape, Portrait };
         private static readonly object managerLock = new object();
         private static AssetBundleMenuManager _instance;
         private AppManager Manager { get; set; }
-        private Transform scrollViewPortraitContainer;
-        private Transform scrollViewLandscapeContainer;
+        private Transform scrollViewContainer;
         private Button _toggleButton;
+        private bool loadingCurrentMesh;
         ///<summary>Static thread-safe singleton instance of AssetBundleMenuManager</summary>
         public static AssetBundleMenuManager Instance
         {
@@ -60,22 +57,13 @@ namespace StudioX
             {
                 Bundles = Manager.ARBundles;
             }
-            InitMenuLandscape();
-            InitMenuPortrait();
+            InitMenu();
+            InitToggleButton();
             StartCoroutine(InitCells());
         }
 
-        public void OnDisable()
-        {
-            foreach (AssetBundle bundle in Bundles)
-            {
-                bundle.Unload(true);
-            }
-            _toggleButton.onClick.RemoveListener(ToggleMenu);
-        }
         public void ToggleMenu()
         {
-            GameObject menu = GetActiveMenu();
             if (menu.activeSelf)
             {
                 menu.SetActive(false);
@@ -102,8 +90,7 @@ namespace StudioX
                         yield return req;
                         if (req.asset)
                         {
-                            AddGameObjectToMenu(true, req.asset as GameObject, b.name);
-                            AddGameObjectToMenu(false, req.asset as GameObject, b.name);
+                            AddGameObjectToMenu(req.asset as GameObject, b.name);
                         }
                     }
                 }
@@ -117,27 +104,27 @@ namespace StudioX
             return Array.FindAll(names, n => n.Contains(uiAssetPrefix));
         }
 
-        private void AddGameObjectToMenu(bool isLandscape, GameObject go, string bundleName)
+        private void AddGameObjectToMenu(GameObject go, string bundleName)
         {
-            GameObject cloned = Instantiate(go, new Vector3(0, 0, 0), Quaternion.identity);
+            GameObject cloned = Instantiate(go, Vector3.zero, Quaternion.identity);
             AssetBundleNameSelector selector = cloned.GetComponent<AssetBundleNameSelector>();
             if (selector)
             {
                 selector.SetCallback((string assetName) => { HandleMenuItemClick(bundleName, assetName); });
             }
-            if (isLandscape)
-            {
-                cloned.transform.SetParent(scrollViewLandscapeContainer);
-            }
-            else
-            {
-                cloned.transform.SetParent(scrollViewPortraitContainer);
-            }
+            cloned.transform.SetParent(scrollViewContainer);
+            cloned.transform.localScale = Vector3.one;
+            cloned.transform.localRotation = Quaternion.identity;
         }
 
+        // TODO replace scroll view with spinner while loading 
         private void HandleMenuItemClick(string bundleName, string assetName)
         {
-            StartCoroutine(LoadCurrentGameObjectFromBundle(bundleName, assetName));
+            // Prevent people from continually tapping on the button multiple times and starting a bunch of coroutines
+            if (!loadingCurrentMesh)
+            {
+                StartCoroutine(LoadCurrentGameObjectFromBundle(bundleName, assetName));
+            }
         }
 
         private IEnumerator LoadCurrentGameObjectFromBundle(string bundleName, string assetName)
@@ -145,15 +132,17 @@ namespace StudioX
             AssetBundle bundle = Bundles.Find(b => b.name == bundleName);
             if (bundle)
             {
+                loadingCurrentMesh = true;
                 AssetBundleRequest req = bundle.LoadAssetAsync(assetName);
                 yield return req;
                 if (req.asset)
                 {
-                    if (CurrentMesh.name != assetName)
+                    if (CurrentMesh && CurrentMesh.name != assetName)
                     {
                         Destroy(CurrentMesh);
                     }
                     CurrentMesh = Instantiate(req.asset as GameObject, new Vector3(0, 0, 0), Quaternion.identity);
+                    loadingCurrentMesh = false;
                     ToggleMenu();
                 }
             }
@@ -162,7 +151,7 @@ namespace StudioX
         private void InitToggleButton()
         {
             _toggleButton = toggleButton.GetComponent<Button>();
-            if (!toggleButton)
+            if (!_toggleButton)
             {
                 throw new MissingComponentException(string.Format("A Button Component is required on {0}", toggleButton.name));
             }
@@ -171,23 +160,14 @@ namespace StudioX
                 _toggleButton.onClick.AddListener(ToggleMenu);
             }
         }
-        private void InitMenuPortrait()
-        {
-            CheckMenuForCanvas(ref menuPortrait);
-            scrollViewPortraitContainer = scrollViewPortrait.transform.Find("Viewport/Content");
-            if (!scrollViewPortraitContainer)
-            {
-                throw new MissingComponentException(string.Format("A ScrollView Component is required on {0}", scrollViewPortrait.name));
-            }
-        }
 
-        private void InitMenuLandscape()
+        private void InitMenu()
         {
-            CheckMenuForCanvas(ref menuLandscape);
-            scrollViewLandscapeContainer = scrollViewLandscape.transform.Find("Viewport/Content");
-            if (!scrollViewLandscapeContainer)
+            CheckMenuForCanvas(ref menu);
+            scrollViewContainer = scrollView.transform.Find("Viewport/Content");
+            if (!scrollViewContainer)
             {
-                throw new MissingComponentException(string.Format("A ScrollView Component is required on {0}", scrollViewLandscape.name));
+                throw new MissingComponentException(string.Format("A ScrollView Component is required on {0}", scrollView.name));
             }
         }
 
@@ -197,20 +177,6 @@ namespace StudioX
             {
                 throw new MissingComponentException(string.Format("A Canvas Component is required on menu {0}", go.name));
             }
-        }
-
-        private int GetActiveMenuId()
-        {
-            return GetActiveMenu().GetInstanceID();
-        }
-
-        private ref GameObject GetActiveMenu()
-        {
-            if (menuPortrait.activeSelf)
-            {
-                return ref menuPortrait;
-            }
-            return ref menuLandscape;
         }
     }
 }

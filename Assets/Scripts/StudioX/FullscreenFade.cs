@@ -60,9 +60,11 @@ public class FullscreenFade : MonoBehaviour
         return maxSortingOrder;
     }
 
-    public void UpdateSortingOrder()
+    public int UpdateSortingOrder()
     {
-        fadeCanvas.GetComponent<Canvas>().sortingOrder = GetMaxSortingOrder() + 1;
+        int sortingOrder = GetMaxSortingOrder() + 1;
+        fadeCanvas.GetComponent<Canvas>().sortingOrder = sortingOrder;
+        return sortingOrder;
     }
 
     /*** Fades ***/

@@ -25,7 +25,8 @@
         // TODO make this a property to set cardboard or daydream
         private const string VRDevice = "cardboard";
         // TODO THESE WILL BE REPLACED WITH REMOTE ASSET BUNDLES
-        private string[] arBundleNames = {"foxyboiassets.unity3d"};
+        private string[] arBundleNames = { "foxyboiassets.unity3d" };
+        private List<Canvas> loadingScreenCanvases;
         public static string FirebaseSdkDir { get; set; }
         public Version FirebaseSdkVersion { get; set; }
         public string landingScene;
@@ -68,10 +69,19 @@
         {
             if (loadingScreen)
             {
+                loadingScreenCanvases = new List<Canvas>();
                 loadingScreen = Instantiate(loadingScreen, new Vector3(0, 0, 0), Quaternion.identity);
+                foreach(Transform child in loadingScreen.transform)
+                {
+                    Canvas canvas = child.gameObject.GetComponent<Canvas>();
+                    if (canvas)
+                    {
+                        loadingScreenCanvases.Add(canvas);
+                    }
+                }
                 DontDestroyOnLoad(loadingScreen);
                 // initialize fading for loading screen
-                FadeController = gameObject.AddComponent(typeof(FullscreenFade)) as FullscreenFade;
+                FadeController = gameObject.AddComponent<FullscreenFade>();
                 loadingScreen.SetActive(false);
                 ToggleLoadingScreen(true);
             }
@@ -98,7 +108,7 @@
 
         public IEnumerator ShowLoadingScreen()
         {
-            Coroutine fade = StartCoroutine(FadeAsync(false));
+            Coroutine fade = StartCoroutine(FadeAsync(false, true));
             yield return fade;
             loadingScreen.SetActive(true);
             fade = StartCoroutine(FadeAsync(true));
@@ -148,7 +158,7 @@
                 }
                 yield return null;
             }
-            Coroutine fadeIn = StartCoroutine(FadeAsync(true));
+            Coroutine fadeIn = StartCoroutine(FadeAsync(true, true));
             yield return fadeIn;
         }
 
@@ -156,7 +166,7 @@
         {
             ARBundles = new List<AssetBundle>();
             // I wonder if this has to be done on the main thread or if they can be done in parallel
-            foreach(string bundlePath in arBundleNames)
+            foreach (string bundlePath in arBundleNames)
             {
                 string absPath = Path.Combine(Application.streamingAssetsPath, bundlePath);
                 var bundleRequest = AssetBundle.LoadFromFileAsync(absPath);
@@ -242,7 +252,7 @@
                 {
                     cam.transform.localPosition = Vector3.zero;
                     cam.transform.localRotation = Quaternion.identity;
-                } 
+                }
             }
         }
 
@@ -250,7 +260,7 @@
         {
             if (updateSortOrder)
             {
-                FadeController.UpdateSortingOrder();
+                UpdateSortingOrder();
             }
 
             if (fadeIn)
@@ -267,6 +277,18 @@
                 while (!t.IsCompleted)
                 {
                     yield return null;
+                }
+            }
+        }
+
+        private void UpdateSortingOrder()
+        {
+            int sortingOrder = FadeController.UpdateSortingOrder();
+            if (loadingScreen)
+            {
+                foreach (Canvas canvas in loadingScreenCanvases)
+                {
+                    canvas.sortingOrder = sortingOrder - 1;
                 }
             }
         }
