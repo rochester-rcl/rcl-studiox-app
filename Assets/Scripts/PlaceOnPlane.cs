@@ -45,6 +45,7 @@ public class PlaceOnPlane : MonoBehaviour
 
     void Awake()
     {
+       // pm.planePrefab.
         m_RaycastManager = GetComponent<ARRaycastManager>();
         m_SessionOrigin = GetComponent<ARSessionOrigin>();
 
