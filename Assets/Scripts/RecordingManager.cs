@@ -19,9 +19,7 @@ using NatCorder.Inputs;
 
 public class RecordingManager : MonoBehaviour
 {
-    [SerializeField]
-    Button recordButton;
-
+    public GameObject recordButton;
     private Button discardButton;
     private Button previewButton;
 
