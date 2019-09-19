@@ -28,7 +28,7 @@ public class PlaceOnPlane : MonoBehaviour
     /// The object instantiated as a result of a successful raycast intersection with a plane.
     /// </summary>
     public GameObject spawnedObject { get; private set; }
-    public bool ignoreTouchEvents = false;
+    public bool enableTouchEvents = true;
     private ARSessionOrigin m_SessionOrigin;
 
     //TODO: Eventually add support for objects without animators.
@@ -56,8 +56,8 @@ public class PlaceOnPlane : MonoBehaviour
         {
             abManager.OnPrefabLoaded += UpdatePlacedPrefab;
         }
-        RecordingManager.OnRecordingStarted += AllowTouchEvents;
-        RecordingManager.OnRecordingEnded += IgnoreTouchEvents;
+        RecordingManager.OnRecordingStarted += DisableTouchEvents;
+        RecordingManager.OnRecordingEnded += EnableTouchEvents;
     }
 
     void Update()
@@ -120,7 +120,7 @@ public class PlaceOnPlane : MonoBehaviour
             }
             else
             {
-                if (!ignoreTouchEvents)
+                if (enableTouchEvents)
                 {
                     switch (touch.phase)
                     {
@@ -177,22 +177,22 @@ public class PlaceOnPlane : MonoBehaviour
 
     public void OnDestroy()
     {
-        RecordingManager.OnRecordingStarted -= IgnoreTouchEvents;
-        RecordingManager.OnRecordingEnded -= AllowTouchEvents;
+        RecordingManager.OnRecordingStarted -= DisableTouchEvents;
+        RecordingManager.OnRecordingEnded -= EnableTouchEvents;
         if (abManager)
         {
             abManager.OnPrefabLoaded -= UpdatePlacedPrefab;
         }
     }
 
-    private void IgnoreTouchEvents()
+    private void EnableTouchEvents()
     {
-        ignoreTouchEvents = true;
+        enableTouchEvents = true;
     }
 
-    private void AllowTouchEvents()
+    private void DisableTouchEvents()
     {
-        ignoreTouchEvents = false;
+        enableTouchEvents = false;
     }
 
     static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();

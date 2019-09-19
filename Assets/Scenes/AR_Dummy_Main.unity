@@ -1124,6 +1124,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PlacedPrefab: {fileID: 6814188422232001849, guid: 4038a070224004d96b8cb97692234d12,
     type: 3}
+  enableTouchEvents: 1
 --- !u!114 &305408262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3583,6 +3584,52 @@ PrefabInstance:
         type: 3}
       propertyPath: onTouchUp.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114130223117990098, guid: d88712a49642b4b49b8322acc70b918b,
+        type: 3}
+      propertyPath: m_Delegates.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114130223117990098, guid: d88712a49642b4b49b8322acc70b918b,
+        type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114130223117990098, guid: d88712a49642b4b49b8322acc70b918b,
+        type: 3}
+      propertyPath: m_Delegates.Array.data[0].eventID
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114130223117990098, guid: d88712a49642b4b49b8322acc70b918b,
+        type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_TypeName
+      value: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI, Version=1.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+      objectReference: {fileID: 0}
+    - target: {fileID: 114130223117990098, guid: d88712a49642b4b49b8322acc70b918b,
+        type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114130223117990098, guid: d88712a49642b4b49b8322acc70b918b,
+        type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114130223117990098, guid: d88712a49642b4b49b8322acc70b918b,
+        type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 405922439}
+    - target: {fileID: 114130223117990098, guid: d88712a49642b4b49b8322acc70b918b,
+        type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TakePhoto
+      objectReference: {fileID: 0}
+    - target: {fileID: 114130223117990098, guid: d88712a49642b4b49b8322acc70b918b,
+        type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 114734979408368796, guid: d88712a49642b4b49b8322acc70b918b,
         type: 3}
