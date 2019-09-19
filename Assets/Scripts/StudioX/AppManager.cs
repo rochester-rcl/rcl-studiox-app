@@ -54,7 +54,7 @@
 
         public static AppManager GetManager()
         {
-            return GameObject.FindObjectOfType(typeof(AppManager)) as AppManager;
+            return GameObject.FindObjectOfType<AppManager>();
         }
 
         public void Start()

@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 9670de854f4f3764f96b61ef869f7d96
 ModelImporter:
-  serializedVersion: 25
+  serializedVersion: 26
   internalIDToNameTable:
   - first:
       74: -203655887218126122
@@ -51,7 +51,7 @@ ModelImporter:
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
@@ -75,6 +75,7 @@ ModelImporter:
     meshCompression: 0
     addColliders: 0
     useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
     importVisibility: 1
     importBlendShapes: 1
     importCameras: 1
@@ -127,5 +128,5 @@ ModelImporter:
   humanoidOversampling: 1
   additionalBone: 0
   userData: 
-  assetBundleName: foxyboiassets
-  assetBundleVariant: unity3d
+  assetBundleName: 
+  assetBundleVariant: 

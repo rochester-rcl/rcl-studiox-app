@@ -6,6 +6,7 @@ TagManager:
   tags:
   - PreviewButton
   - DiscardButton
+  - UICamera
   layers:
   - Default
   - TransparentFX

@@ -6,6 +6,7 @@ using UnityEngine;
 //using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using StudioX;
 
 [RequireComponent(typeof(ARRaycastManager))]
 public class PlaceOnPlane : MonoBehaviour
@@ -13,7 +14,7 @@ public class PlaceOnPlane : MonoBehaviour
     [SerializeField]
     [Tooltip("Instantiates this prefab on a plane at the touch location.")]
     GameObject m_PlacedPrefab;
-
+    // TODO come up with default placed prefab?
     /// <summary>
     /// The prefab to instantiate on touch.
     /// </summary>
@@ -22,11 +23,12 @@ public class PlaceOnPlane : MonoBehaviour
         get { return m_PlacedPrefab; }
         set { m_PlacedPrefab = value; }
     }
-    
+
     /// <summary>
     /// The object instantiated as a result of a successful raycast intersection with a plane.
     /// </summary>
     public GameObject spawnedObject { get; private set; }
+    public bool ignoreTouchEvents = false;
     private ARSessionOrigin m_SessionOrigin;
 
     //TODO: Eventually add support for objects without animators.
@@ -43,24 +45,31 @@ public class PlaceOnPlane : MonoBehaviour
 
     private bool in_touch_drag = false;
 
+    private AssetBundleMenuManager abManager;
     void Awake()
     {
-       // pm.planePrefab.
+        // pm.planePrefab.
         m_RaycastManager = GetComponent<ARRaycastManager>();
         m_SessionOrigin = GetComponent<ARSessionOrigin>();
-
+        abManager = AssetBundleMenuManager.GetManager();
+        if (abManager)
+        {
+            abManager.OnPrefabLoaded += UpdatePlacedPrefab;
+        }
+        RecordingManager.OnRecordingStarted += AllowTouchEvents;
+        RecordingManager.OnRecordingEnded += IgnoreTouchEvents;
     }
 
     void Update()
     {
 
-       // bool isP = recordButton.OnPointerDown
+        // bool isP = recordButton.OnPointerDown
 
         if (Input.touchCount == 0)
             return;
-        
+
         if (Input.touchCount == 2)
-        {                   
+        {
             Touch touch0 = Input.GetTouch(0);
             Touch touch1 = Input.GetTouch(1);
 
@@ -111,32 +120,36 @@ public class PlaceOnPlane : MonoBehaviour
             }
             else
             {
-                switch(touch.phase)
+                if (!ignoreTouchEvents)
                 {
-                    case TouchPhase.Began:
-                        in_touch_drag = false;
-                        break;
+                    switch (touch.phase)
+                    {
+                        case TouchPhase.Began:
+                            in_touch_drag = false;
+                            break;
 
-                    case TouchPhase.Moved:
-                        in_touch_drag = true;
+                        case TouchPhase.Moved:
+                            in_touch_drag = true;
 
-                        if (Input.touchCount == 1)
-                        {
-                            Vector3 objPosDiff = prevObjPos - raycastHit;
-                            spawnedObject.transform.position += (-objPosDiff * position_factor);
-                        }
+                            if (Input.touchCount == 1)
+                            {
+                                Vector3 objPosDiff = prevObjPos - raycastHit;
+                                spawnedObject.transform.position += (-objPosDiff * position_factor);
+                            }
 
-                        break;
+                            break;
 
-                    case TouchPhase.Ended:
-                        if (!in_touch_drag)
-                        {
-                            spawnedObject.transform.position = raycastHit;
-                        }
-                        in_touch_drag = false;
-                        break;
+                        case TouchPhase.Ended:
+                            if (!in_touch_drag)
+                            {
+                                spawnedObject.transform.position = raycastHit;
+                            }
+                            in_touch_drag = false;
+                            break;
+                    }
                 }
             }
+
         }
 
         if (spawnedObject != null)
@@ -144,6 +157,42 @@ public class PlaceOnPlane : MonoBehaviour
             prevObjPos = spawnedObject.transform.position;
         }
 
+    }
+
+    public void UpdatePlacedPrefab(ref GameObject prefab)
+    {
+        if (placedPrefab == null)
+        {
+            placedPrefab = prefab;
+        }
+        else
+        {
+            if (prefab.name != placedPrefab.name)
+            {
+                placedPrefab = prefab;
+                Destroy(spawnedObject);
+            }
+        }
+    }
+
+    public void OnDestroy()
+    {
+        RecordingManager.OnRecordingStarted -= IgnoreTouchEvents;
+        RecordingManager.OnRecordingEnded -= AllowTouchEvents;
+        if (abManager)
+        {
+            abManager.OnPrefabLoaded -= UpdatePlacedPrefab;
+        }
+    }
+
+    private void IgnoreTouchEvents()
+    {
+        ignoreTouchEvents = true;
+    }
+
+    private void AllowTouchEvents()
+    {
+        ignoreTouchEvents = false;
     }
 
     static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();

@@ -13,14 +13,16 @@ namespace StudioX
         public GameObject scrollView;
         public GameObject toggleButton;
         public string uiAssetPrefix = "ui_";
-        public GameObject CurrentMesh { get; set; }
+        public delegate void PrefabLoaded(ref GameObject prefab);
+        public event PrefabLoaded OnPrefabLoaded;
         private int currentMenuId;
         private static readonly object managerLock = new object();
         private static AssetBundleMenuManager _instance;
         private AppManager Manager { get; set; }
         private Transform scrollViewContainer;
         private Button _toggleButton;
-        private bool loadingCurrentMesh;
+        private bool loadingCurrentPrefab;
+
         ///<summary>Static thread-safe singleton instance of AssetBundleMenuManager</summary>
         public static AssetBundleMenuManager Instance
         {
@@ -31,6 +33,11 @@ namespace StudioX
                     return _instance;
                 }
             }
+        }
+
+        public static AssetBundleMenuManager GetManager()
+        {
+            return GameObject.FindObjectOfType<AssetBundleMenuManager>();
         }
 
         public void Awake()
@@ -121,7 +128,7 @@ namespace StudioX
         private void HandleMenuItemClick(string bundleName, string assetName)
         {
             // Prevent people from continually tapping on the button multiple times and starting a bunch of coroutines
-            if (!loadingCurrentMesh)
+            if (!loadingCurrentPrefab)
             {
                 StartCoroutine(LoadCurrentGameObjectFromBundle(bundleName, assetName));
             }
@@ -132,17 +139,17 @@ namespace StudioX
             AssetBundle bundle = Bundles.Find(b => b.name == bundleName);
             if (bundle)
             {
-                loadingCurrentMesh = true;
+                loadingCurrentPrefab = true;
                 AssetBundleRequest req = bundle.LoadAssetAsync(assetName);
                 yield return req;
                 if (req.asset)
                 {
-                    if (CurrentMesh && CurrentMesh.name != assetName)
+                    GameObject go = req.asset as GameObject;
+                    if (OnPrefabLoaded != null)
                     {
-                        Destroy(CurrentMesh);
+                        OnPrefabLoaded(ref go);
                     }
-                    CurrentMesh = Instantiate(req.asset as GameObject, new Vector3(0, 0, 0), Quaternion.identity);
-                    loadingCurrentMesh = false;
+                    loadingCurrentPrefab = false;
                     ToggleMenu();
                 }
             }

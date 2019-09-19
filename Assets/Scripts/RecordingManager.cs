@@ -22,6 +22,12 @@ public class RecordingManager : MonoBehaviour
     public GameObject recordButton;
     private Button discardButton;
     private Button previewButton;
+    public delegate void RecordingStarted();
+    public delegate void RecordingEnded();
+    public static event RecordingStarted OnRecordingStarted;
+    public static event RecordingEnded OnRecordingEnded;
+    private const string albumName = "StudioX";
+    private List<string> tempPaths;
 
     [SerializeField]
     Camera mainARCamera;
@@ -41,19 +47,25 @@ public class RecordingManager : MonoBehaviour
 
         discardButton.gameObject.SetActive(false);
         previewButton.gameObject.SetActive(false);
+
+        tempPaths = new List<string>();
     }
 
     public void StartRecording()
     {
         //toggle AR camera's culling flags so the plane/point cloud won't show up in the recording video/gif.
         mainARCamera.cullingMask &= ~(1 << LayerMask.NameToLayer("TransparentFX"));
+        if (OnRecordingStarted != null)
+        {
+            OnRecordingStarted();
+        }
 #if UNITY_IOS
         ReplayKit.StartRecording();
 #endif
 
 #if UNITY_ANDROID
         // Start recording
-        gifRecorder = new NatCorder.GIFRecorder(Screen.width/3, Screen.height/3, frameDuration, OnGIF);
+        gifRecorder = new NatCorder.GIFRecorder(Screen.width / 3, Screen.height / 3, frameDuration, OnGIF);
         // Create a camera input
         cameraInput = new CameraInput(gifRecorder, new RealtimeClock(), Camera.main);
         // Get a real GIF look by skipping frames
@@ -64,6 +76,10 @@ public class RecordingManager : MonoBehaviour
     public void StopRecording()
     {
         mainARCamera.cullingMask |= 1 << LayerMask.NameToLayer("TransparentFX");
+        if (OnRecordingEnded != null)
+        {
+            OnRecordingEnded();
+        }
 #if UNITY_IOS
         ReplayKit.StopRecording();
         toggleRecordingUI(false);
@@ -93,10 +109,32 @@ public class RecordingManager : MonoBehaviour
     private void OnGIF(string path)
     {
         Debug.Log("Saved recording to: " + path);
+        // Move video from internal files to albums
+        long date_long = System.DateTime.UtcNow.Ticks;
+        string filename = "AR_GIF-" + date_long.ToString() + ".gif";
+        // copy to a useful location and destroy it after 
+        NativeGallery.SaveImageToGallery(path, albumName, filename, null);
         // Playback the video
         Application.OpenURL(path);
+        tempPaths.Add(path);
+    }
+
+    private void CleanUpTemp()
+    {
+        Debug.Log("Removing temporary images");
+        for (int i = 0; i < tempPaths.Count; i++)
+        {
+            File.Delete(tempPaths[i]);
+        }
     }
 #endif
+
+    public void OnDestroy()
+    {
+#if UNITY_ANDROID
+        CleanUpTemp();
+#endif
+    }
 
     public void TakePhoto()
     {
@@ -119,9 +157,9 @@ public class RecordingManager : MonoBehaviour
         //_preview.texture = screenShot;
         byte[] stillImageResult = screenShot.EncodeToPNG();
         long date_long = System.DateTime.UtcNow.Ticks;
-        
+
         string filename = "AR_Photo-" + date_long.ToString() + ".png";
-        NativeGallery.SaveImageToGallery(stillImageResult, "album", filename, null);
+        NativeGallery.SaveImageToGallery(stillImageResult, albumName, filename, null);
 
         mainARCamera.cullingMask |= 1 << LayerMask.NameToLayer("TransparentFX");
     }
@@ -136,4 +174,4 @@ public class RecordingManager : MonoBehaviour
         discardButton.gameObject.SetActive(!toggle);
     }
 #endif
-    }
+}
