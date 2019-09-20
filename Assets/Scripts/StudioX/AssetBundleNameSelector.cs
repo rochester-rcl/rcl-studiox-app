@@ -35,6 +35,11 @@ namespace StudioX
         public void OnEnable()
         {
             assetName = serializedObject.FindProperty("assetName");
+            string[] assets = AssetDatabase.FindAssets(assetName.stringValue);
+            if (assets.Length > 0)
+            {
+                assetObj = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(assets[0]));
+            }
         }
 
         public override void OnInspectorGUI()
@@ -43,6 +48,7 @@ namespace StudioX
             assetObj = EditorGUILayout.ObjectField("Asset Bundle Asset", assetObj, typeof(GameObject), false) as GameObject;
             assetName.stringValue = assetObj.name;
             serializedObject.ApplyModifiedProperties();
+
         }
     }
 #endif

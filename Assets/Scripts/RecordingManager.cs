@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.IO;
+using StudioX;
 #if UNITY_IOS
 using UnityEngine.iOS;
 using UnityEngine.Apple.ReplayKit;
@@ -20,13 +21,17 @@ using NatCorder.Inputs;
 public class RecordingManager : MonoBehaviour
 {
     public GameObject recordButton;
+    public GameObject activityIndicator;
     private Button discardButton;
     private Button previewButton;
+    private ActivityIndicatorMessage activityMessage;
     public delegate void RecordingStarted();
     public delegate void RecordingEnded();
     public static event RecordingStarted OnRecordingStarted;
     public static event RecordingEnded OnRecordingEnded;
     private const string albumName = "StudioX";
+    private const string savingMessage = "Saving ...";
+    private const string savedMessage = "Saved!";
     private List<string> tempPaths;
 
     [SerializeField]
@@ -44,10 +49,11 @@ public class RecordingManager : MonoBehaviour
     {
         discardButton = GameObject.FindGameObjectWithTag("DiscardButton").GetComponent<Button>();
         previewButton = GameObject.FindGameObjectWithTag("PreviewButton").GetComponent<Button>();
-
         discardButton.gameObject.SetActive(false);
         previewButton.gameObject.SetActive(false);
-
+        activityMessage = activityIndicator.GetComponent<ActivityIndicatorMessage>();
+        activityMessage.ToggleText(false);
+        activityMessage.FadeEnabled = true;
         tempPaths = new List<string>();
     }
 
@@ -88,6 +94,8 @@ public class RecordingManager : MonoBehaviour
 #if UNITY_ANDROID
         cameraInput.Dispose();
         gifRecorder.Dispose();
+        activityMessage.ToggleText(true);
+        activityMessage.ActivityMessage = savingMessage;
 #endif
 
     }
@@ -116,6 +124,8 @@ public class RecordingManager : MonoBehaviour
         NativeGallery.SaveImageToGallery(path, albumName, filename, null);
         // Playback the video
         Application.OpenURL(path);
+        activityMessage.ActivityMessage = savedMessage;
+        activityMessage.ToggleText(false, 3);
         tempPaths.Add(path);
     }
 
@@ -157,10 +167,12 @@ public class RecordingManager : MonoBehaviour
         //_preview.texture = screenShot;
         byte[] stillImageResult = screenShot.EncodeToPNG();
         long date_long = System.DateTime.UtcNow.Ticks;
-
+        
         string filename = "AR_Photo-" + date_long.ToString() + ".png";
         NativeGallery.SaveImageToGallery(stillImageResult, albumName, filename, null);
-
+        activityMessage.ToggleText(true);
+        activityMessage.ActivityMessage = savedMessage;
+        activityMessage.ToggleText(false, 3);
         mainARCamera.cullingMask |= 1 << LayerMask.NameToLayer("TransparentFX");
     }
     //Don't need to have discard or preview buttons for Android since natcorder automatically opens the gif which leads to
