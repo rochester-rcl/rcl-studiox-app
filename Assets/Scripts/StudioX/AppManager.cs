@@ -25,7 +25,7 @@
         // TODO make this a property to set cardboard or daydream
         private const string VRDevice = "cardboard";
         // TODO THESE WILL BE REPLACED WITH REMOTE ASSET BUNDLES
-        private string[] arBundleNames = { "foxyboiassets.unity3d" };
+        private string[] arBundleNames = { "foxyboiassets.unity3d", "groundboiassets.unity3d" };
         private List<Canvas> loadingScreenCanvases;
         public static string FirebaseSdkDir { get; set; }
         public Version FirebaseSdkVersion { get; set; }

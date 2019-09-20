@@ -6,9 +6,7 @@
 
     public class DeviceOrientationManager : MonoBehaviour
     {
-        [SerializeField]
         public GameObject portraitUI;
-        [SerializeField]
         public GameObject landscapeUI;
         private ScreenOrientation Orientation { get; set; }
         public delegate void OrientationChanged(ScreenOrientation orientation);
@@ -20,9 +18,14 @@
 
         public bool IsDeviceLandscape()
         {
-            if (Orientation == ScreenOrientation.Landscape) return true;
-            if (Orientation == ScreenOrientation.LandscapeLeft) return true;
-            if (Orientation == ScreenOrientation.LandscapeRight) return true;
+            return IsDeviceLandscape(Orientation);
+        }
+
+        public static bool IsDeviceLandscape(ScreenOrientation orientation)
+        {
+            if (orientation == ScreenOrientation.Landscape) return true;
+            if (orientation == ScreenOrientation.LandscapeLeft) return true;
+            if (orientation == ScreenOrientation.LandscapeRight) return true;
             return false;
         }
 
