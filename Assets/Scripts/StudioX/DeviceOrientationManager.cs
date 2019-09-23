@@ -3,14 +3,20 @@
     using System.Collections;
     using System.Collections.Generic;
     using UnityEngine;
-
+    using UnityEngine.UI;
+    // using screen orientation because of jank with DeviceOrientation 
+    // TODO refactor to ScreenOrientationManager
     public class DeviceOrientationManager : MonoBehaviour
     {
         public GameObject portraitUI;
         public GameObject landscapeUI;
-        private ScreenOrientation Orientation { get; set; }
-        public delegate void OrientationChanged(ScreenOrientation orientation);
-        public static event OrientationChanged OnOrientationChanged;
+        public ScreenOrientation Orientation { get; set; }
+        private DeviceOrientation NativeOrientation { get; set; }
+        // TODO change to ScreenOrientationChanged and DeviceOrientationChanged
+        public delegate void ScreenOrientationChanged(ScreenOrientation orientation);
+        public static event ScreenOrientationChanged OnOrientationChanged;
+        public delegate void DeviceOrientationChanged(DeviceOrientation orientation);
+        public static event DeviceOrientationChanged OnDeviceOrientationChanged;
         void Start()
         {
             SetUI();
@@ -27,6 +33,18 @@
             if (orientation == ScreenOrientation.LandscapeLeft) return true;
             if (orientation == ScreenOrientation.LandscapeRight) return true;
             return false;
+        }
+
+        public static bool IsDeviceLandscape(DeviceOrientation orientation)
+        {
+            if (orientation == DeviceOrientation.LandscapeLeft) return true;
+            if (orientation == DeviceOrientation.LandscapeRight) return true;
+            return false;
+        }
+
+        public static DeviceOrientation GetDeviceOrientation()
+        {
+            return Input.deviceOrientation;
         }
 
         public void SetUI()
@@ -53,13 +71,20 @@
                 }
                 if (OnOrientationChanged != null)
                 {
-                    OnOrientationChanged(Screen.orientation);
+                    OnOrientationChanged(Orientation);
                 }
             }
-
+            if (NativeOrientation != Input.deviceOrientation)
+            {
+                NativeOrientation = Input.deviceOrientation;
+                if (OnDeviceOrientationChanged != null)
+                {
+                    OnDeviceOrientationChanged(NativeOrientation);
+                }
+            }
         }
 
-        void Update()
+        void FixedUpdate()
         {
             SetUI();
         }
