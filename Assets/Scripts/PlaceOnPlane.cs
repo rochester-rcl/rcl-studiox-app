@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 //using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using StudioX;
@@ -43,9 +44,8 @@ public class PlaceOnPlane : MonoBehaviour
 
     private Vector3 prevObjPos = Vector3.zero;
 
-    private bool in_touch_drag = false;
-
     private AssetBundleMenuManager abManager;
+
     void Awake()
     {
         // pm.planePrefab.
@@ -62,8 +62,6 @@ public class PlaceOnPlane : MonoBehaviour
 
     void Update()
     {
-
-        // bool isP = recordButton.OnPointerDown
 
         if (Input.touchCount == 0)
             return;
@@ -99,57 +97,51 @@ public class PlaceOnPlane : MonoBehaviour
             }
 
         }
-
-        Touch touch = Input.GetTouch(0);
-
-        Vector3 raycastHit = Vector3.one;
-
-        if (m_RaycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon))
+        else
         {
-            // Raycast hits are sorted by distance, so the first one
-            // will be the closest hit.
-            var hitPose = s_Hits[0].pose;
-
-            raycastHit = hitPose.position;
-
-            if (spawnedObject == null)
+            Touch touch = Input.GetTouch(0);
+            // Don't move spawnedObject if the instructions are up
+            if (EventSystem.current.IsPointerOverGameObject(touch.fingerId)) return;
+            // if (EventSystem.current.IsPointerOverGameObject(touch.fingerId)) return;
+            Vector3 raycastHit = Vector3.one;
+            if (m_RaycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon))
             {
-                spawnedObject = Instantiate(m_PlacedPrefab, raycastHit, hitPose.rotation);
-                spawnedObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-                prevObjPos = spawnedObject.transform.position;
-            }
-            else
-            {
-                if (enableTouchEvents)
+                // Raycast hits are sorted by distance, so the first one
+                // will be the closest hit.
+                var hitPose = s_Hits[0].pose;
+
+                raycastHit = hitPose.position;
+
+                if (spawnedObject == null)
                 {
-                    switch (touch.phase)
+                    spawnedObject = Instantiate(m_PlacedPrefab, raycastHit, hitPose.rotation);
+                    prevObjPos = spawnedObject.transform.position;
+                }
+                else
+                {
+                    if (enableTouchEvents)
                     {
-                        case TouchPhase.Began:
-                            in_touch_drag = false;
-                            break;
+                        switch (touch.phase)
+                        {
+                            case TouchPhase.Began:
+                                if (IsDoubleTap(touch))
+                                {
+                                    spawnedObject.transform.position = raycastHit;
+                                }
+                                break;
 
-                        case TouchPhase.Moved:
-                            in_touch_drag = true;
-
-                            if (Input.touchCount == 1)
-                            {
-                                Vector3 objPosDiff = prevObjPos - raycastHit;
-                                spawnedObject.transform.position += (-objPosDiff * position_factor);
-                            }
-
-                            break;
-
-                        case TouchPhase.Ended:
-                            if (!in_touch_drag)
-                            {
-                                spawnedObject.transform.position = raycastHit;
-                            }
-                            in_touch_drag = false;
-                            break;
+                            case TouchPhase.Moved:
+                                if (Input.touchCount == 1)
+                                {
+                                    Vector3 objPosDiff = prevObjPos - raycastHit;
+                                    spawnedObject.transform.position += (-objPosDiff * position_factor);
+                                }
+                                break;
+                        }
                     }
                 }
-            }
 
+            }
         }
 
         if (spawnedObject != null)
@@ -183,6 +175,17 @@ public class PlaceOnPlane : MonoBehaviour
         {
             abManager.OnPrefabLoaded -= UpdatePlacedPrefab;
         }
+    }
+
+    private bool IsDoubleTap(Touch touch)
+    {
+        float deltaTime = touch.deltaTime;
+        float deltaMagnitude = touch.deltaPosition.magnitude;
+        if (deltaTime > 0 && deltaTime < 0.2f && deltaMagnitude < 1.0f)
+        {
+            return true;
+        }
+        return false;
     }
 
     private void EnableTouchEvents()
