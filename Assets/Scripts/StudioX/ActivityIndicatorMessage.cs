@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Threading.Tasks;
 namespace StudioX
 {
     [RequireComponent(typeof(Text))]
@@ -30,6 +31,12 @@ namespace StudioX
             {
                 textComponent.enabled = val;
             }
+        }
+
+        public async Task ToggleTextAsync(bool val, int timeout)
+        {
+            await Task.Delay(timeout * 1000);
+            textComponent.enabled = val;
         }
 
         private IEnumerator ToggleTextTimeout(bool val, int duration)

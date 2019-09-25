@@ -147,6 +147,7 @@ namespace StudioX
             private void StopRecording()
             {
                 recording = false;
+                cam.cullingMask = ~(-1);
                 progress.SetActive(false);
                 Time.captureFramerate = 0;
             }

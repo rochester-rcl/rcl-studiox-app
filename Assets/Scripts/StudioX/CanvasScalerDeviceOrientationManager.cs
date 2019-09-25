@@ -18,6 +18,14 @@ namespace StudioX
             else
             {
                 DeviceOrientationManager.OnOrientationChanged += UpdateCanvasScaler;
+                if (DeviceOrientationManager.IsDeviceLandscape(Screen.orientation))
+                {
+                    scaler.matchWidthOrHeight = 1;
+                }
+                else
+                {
+                    scaler.matchWidthOrHeight = 0;
+                }
             }
         }
 
@@ -35,8 +43,8 @@ namespace StudioX
         {
             if (DeviceOrientationManager.IsDeviceLandscape(orientation))
             {
+                yield return null;
                 scaler.matchWidthOrHeight = 1;
-                
             }
             else
             {

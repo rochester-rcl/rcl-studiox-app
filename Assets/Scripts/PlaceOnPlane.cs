@@ -179,6 +179,7 @@ public class PlaceOnPlane : MonoBehaviour
 
     private bool IsDoubleTap(Touch touch)
     {
+        #if UNITY_ANDROID
         float deltaTime = touch.deltaTime;
         float deltaMagnitude = touch.deltaPosition.magnitude;
         if (deltaTime > 0 && deltaTime < 0.2f && deltaMagnitude < 1.0f)
@@ -186,6 +187,10 @@ public class PlaceOnPlane : MonoBehaviour
             return true;
         }
         return false;
+        #endif
+        #if UNITY_IOS
+        return touch.tapCount == 2;
+        #endif
     }
 
     private void EnableTouchEvents()

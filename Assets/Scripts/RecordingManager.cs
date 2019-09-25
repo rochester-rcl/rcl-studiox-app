@@ -17,7 +17,7 @@ using NatCorder.Inputs;
 #endif
 
 //manages recording and ui for both ios/android versions of the AR studio x app.
-
+// TODO looks like there is no way around simply recording the screen with ReplayKit API so we'll have to consider using NatCorder on iOS as well ...
 public class RecordingManager : MonoBehaviour
 {
     public GameObject recordButton;
@@ -32,6 +32,7 @@ public class RecordingManager : MonoBehaviour
     private const string albumName = "StudioX";
     private const string savingMessage = "Saving ...";
     private const string savedMessage = "Saved!";
+    private const string discardMessage = "Discarded!";
     private List<string> tempPaths;
 
     [SerializeField]
@@ -81,7 +82,7 @@ public class RecordingManager : MonoBehaviour
 
     public void StopRecording()
     {
-        mainARCamera.cullingMask |= 1 << LayerMask.NameToLayer("TransparentFX");
+        mainARCamera.cullingMask |= (1 << LayerMask.NameToLayer("TransparentFX"));
         if (OnRecordingEnded != null)
         {
             OnRecordingEnded();
@@ -100,16 +101,22 @@ public class RecordingManager : MonoBehaviour
 
     }
 #if UNITY_IOS
-    public void DiscardRecording()
+    public async void DiscardRecording()
     {
         ReplayKit.Discard();
         toggleRecordingUI(true);
+        activityMessage.ToggleText(true);
+        activityMessage.ActivityMessage = discardMessage;
+        await activityMessage.ToggleTextAsync(false, 3);
     }
 
-    public void PreviewRecording()
+    public async void PreviewRecording()
     {
         ReplayKit.Preview();
         toggleRecordingUI(true);
+        activityMessage.ToggleText(true);
+        activityMessage.ActivityMessage = savedMessage;
+        await activityMessage.ToggleTextAsync(false, 3);
     }
 #endif
 
@@ -131,7 +138,6 @@ public class RecordingManager : MonoBehaviour
 
     private void CleanUpTemp()
     {
-        Debug.Log("Removing temporary images");
         for (int i = 0; i < tempPaths.Count; i++)
         {
             File.Delete(tempPaths[i]);
