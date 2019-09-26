@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/AppManager.unity
     guid: e49b9411f497ea93cae0f7d29b0aff97
+  - enabled: 1
+    path: Assets/Scenes/LandingScene_Main.unity
+    guid: b329b17a886bf4d528379879a8e102bb
   - enabled: 0
     path: Assets/Scenes/Loading_Main.unity
     guid: 0bfc1ac51fcebc18fa4a0ba046cf164b
@@ -24,7 +27,7 @@ EditorBuildSettings:
     path: Assets/Scenes/AR_Dummy_Main.unity
     guid: c341e5d34906abeb995b2567cafa78a8
   - enabled: 0
-    path: Assets/GoogleVR/Demos/Scenes/HelloVR.unity
+    path: 
     guid: bb36d2905dc634f1c9eecb35beecaca8
   - enabled: 0
     path: Assets/Scenes/AR_Main_2.unity

@@ -83,7 +83,10 @@
                 // initialize fading for loading screen
                 FadeController = gameObject.AddComponent<FullscreenFade>();
                 loadingScreen.SetActive(false);
-                ToggleLoadingScreen(true);
+                if (string.IsNullOrWhiteSpace(landingScene))
+                {
+                    ToggleLoadingScreen(true);
+                }
             }
         }
 
@@ -119,7 +122,7 @@
         {
             if (!string.IsNullOrWhiteSpace(landingScene))
             {
-                StartCoroutine(LoadAsyncScene(landingScene, AppState.Landing));
+                StartCoroutine(LoadAsyncScene(landingScene, AppState.Landing, false));
             }
             else
             {
@@ -321,7 +324,7 @@
             {
                 if (Input.touchCount > 0 || Input.GetMouseButtonDown(0))
                 {
-                    bool showLoading = !string.IsNullOrWhiteSpace(landingScene) ? true : false;
+                    bool showLoading = string.IsNullOrWhiteSpace(landingScene) ? true : false;
                     LoadScene(menuScene, AppState.Menu, showLoading);
                 }
             }
@@ -412,7 +415,6 @@
             {
                 Firebase.Messaging.FirebaseMessaging.TokenReceived += OnTokenReceived;
                 Firebase.Messaging.FirebaseMessaging.MessageReceived += OnMessageReceived;
-                Debug.Log(firebaseMessagingTopic.Length);
                 if (!string.IsNullOrWhiteSpace(firebaseMessagingTopic))
                 {
                     string fbTopic = firebaseMessagingTopic.ToLower().Replace(" ", "-");
