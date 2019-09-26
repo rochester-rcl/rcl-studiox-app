@@ -40,7 +40,7 @@ public class PlaceOnPlane : MonoBehaviour
     private float position_factor = 0.1f;
 
     private float min_scale_value = 0.1f;
-    private float max_scale_value = 10f;
+    private float max_scale_value = 1000.0f;
 
     private Vector3 prevObjPos = Vector3.zero;
 

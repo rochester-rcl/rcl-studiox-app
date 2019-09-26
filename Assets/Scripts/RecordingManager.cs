@@ -21,6 +21,7 @@ using NatCorder.Inputs;
 public class RecordingManager : MonoBehaviour
 {
     public GameObject recordButton;
+    public GameObject navGroup;
     public GameObject activityIndicator;
     private Button discardButton;
     private Button previewButton;
@@ -101,22 +102,19 @@ public class RecordingManager : MonoBehaviour
 
     }
 #if UNITY_IOS
-    public async void DiscardRecording()
+    public void DiscardRecording()
     {
         ReplayKit.Discard();
         toggleRecordingUI(true);
         activityMessage.ToggleText(true);
         activityMessage.ActivityMessage = discardMessage;
-        await activityMessage.ToggleTextAsync(false, 3);
+        activityMessage.ToggleText(false, 3);
     }
 
-    public async void PreviewRecording()
+    public void PreviewRecording()
     {
         ReplayKit.Preview();
         toggleRecordingUI(true);
-        activityMessage.ToggleText(true);
-        activityMessage.ActivityMessage = savedMessage;
-        await activityMessage.ToggleTextAsync(false, 3);
     }
 #endif
 
@@ -187,7 +185,7 @@ public class RecordingManager : MonoBehaviour
     private void toggleRecordingUI(bool toggle)
     {
         recordButton.gameObject.SetActive(toggle);
-
+        navGroup.gameObject.SetActive(toggle);
         previewButton.gameObject.SetActive(!toggle);
         discardButton.gameObject.SetActive(!toggle);
     }

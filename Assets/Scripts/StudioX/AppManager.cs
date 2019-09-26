@@ -217,6 +217,11 @@
             StartCoroutine(LoadAsyncVRScene(sceneName));
         }
 
+        public void LoadMenu()
+        {
+            LoadScene(menuScene, AppState.Menu);
+        }
+
         private IEnumerator LoadAsyncVRScene(string sceneName)
         {
             Coroutine coroutine = StartCoroutine(LoadAsyncScene(sceneName, AppState.VR));
@@ -229,7 +234,6 @@
         {
             if (string.Compare(XRSettings.loadedDeviceName, VRDevice, true) != 0)
             {
-                Debug.Log("THIS IS THE VR SCENE");
                 XRSettings.LoadDeviceByName(VRDevice);
                 yield return null;
             }

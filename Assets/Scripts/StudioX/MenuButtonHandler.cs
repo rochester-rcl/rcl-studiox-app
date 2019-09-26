@@ -52,8 +52,6 @@ namespace StudioX
         SerializedProperty isVR;
         [SerializeField]
         private SceneAsset sceneObj;
-        [SerializeField]
-        private bool vrState;
 
         void OnEnable()
         {
@@ -71,8 +69,7 @@ namespace StudioX
             serializedObject.Update();
             sceneObj = EditorGUILayout.ObjectField("Scene", sceneObj, typeof(SceneAsset), false) as SceneAsset;
             sceneName.stringValue = sceneObj ? sceneObj.name : null;
-            vrState = EditorGUILayout.Toggle("VR Scene", vrState);
-            isVR.boolValue = vrState;
+            isVR.boolValue = EditorGUILayout.Toggle("VR Scene", isVR.boolValue);
             serializedObject.ApplyModifiedProperties();
         }
     }
