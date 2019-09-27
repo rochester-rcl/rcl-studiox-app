@@ -34,6 +34,7 @@ public class RecordingManager : MonoBehaviour
     private const string savingMessage = "Saving ...";
     private const string savedMessage = "Saved!";
     private const string discardMessage = "Discarded!";
+    private const string previewMessage = "Previewing!";
     private List<string> tempPaths;
 
     [SerializeField]
@@ -115,6 +116,9 @@ public class RecordingManager : MonoBehaviour
     {
         ReplayKit.Preview();
         toggleRecordingUI(true);
+        activityMessage.ToggleText(true);
+        activityMessage.ActivityMessage = previewMessage;
+        activityMessage.ToggleText(false, 3);
     }
 #endif
 

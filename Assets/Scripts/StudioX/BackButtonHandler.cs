@@ -23,7 +23,7 @@ namespace StudioX
             }
         }
 
-        public void OnDisable()
+        public void OnDestroy()
         {
             button.onClick.RemoveListener(manager.LoadMenu);
         }
