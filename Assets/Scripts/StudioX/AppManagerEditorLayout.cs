@@ -9,13 +9,19 @@ namespace StudioX
     [CustomEditor(typeof(AppManager))]
     public class AppManagerEditorLayout : Editor
     {
+        /// <summary>The SerializedProperty for <see cref="AppManager.landingScene"/>.</summary>
         SerializedProperty landingScene;
+        /// <summary> The <see cref="UnityEditor.SceneAsset"/> placeholder for <see cref="landingScene"/>.</summary>
         private SceneAsset landingSceneObj;
+        /// <summary>The SerializedProperty for <see cref="AppManager.loadingScreen"/>.</summary>
         SerializedProperty loadingScreen;
+        /// <summary>The SerializedProperty for <see cref="AppManager.menuScene"/>.</summary>
         SerializedProperty menuScene;
+        /// <summary> The <see cref="UnityEditor.SceneAsset"/> placeholder for <see cref="menuScene"/>.</summary>
         private SceneAsset menuSceneObj;
+        /// <summary>The SerializedProperty for <see cref="AppManager.firebaseMessagingTopic"/>.</summary>
         SerializedProperty firebaseMessagingTopic;
-        private const string EditorPrefsKey = "AppManagerEditorLayoutKey";
+        /// <summary>Initializes all SerializedProperty fields from <see cref="AppManagerEditorLayout.serializedObject"/>.</summary>
         public void OnEnable()
         {
             landingScene = serializedObject.FindProperty("landingScene");
@@ -25,7 +31,10 @@ namespace StudioX
             menuSceneObj = LoadSceneAsset(menuScene.stringValue);
             firebaseMessagingTopic = serializedObject.FindProperty("firebaseMessagingTopic");
         }
-
+        /// <summary>Loads a <see cref="UnityEditor.SceneAsset" /> from a scene name. </summary>
+        /// <param name="sceneName">The name of the <see cref="UnityEditor.SceneAsset" /> to load.</param>
+        /// <para>Note that if there are multiple scenes with the same name the first scene found will be returned</para>
+        /// <returns>A <see cref="UnityEditor.SceneAsset" /> if found, or null if not found.</returns>
         private SceneAsset LoadSceneAsset(string sceneName)
         {
             string[] scenes = AssetDatabase.FindAssets(sceneName);
@@ -38,7 +47,7 @@ namespace StudioX
                 return null;
             }
         }
-
+        /// <summary>Sets all of the SerializedProperty fields from the inspector GUI.</summary>
         public override void OnInspectorGUI()
         {
             serializedObject.Update();

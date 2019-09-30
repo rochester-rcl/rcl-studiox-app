@@ -8,14 +8,23 @@ namespace StudioX
 {
     public class AssetBundleMenuManager : MonoBehaviour
     {
+        /// <summary>The List of <see cref="UnityEngine.AssetBundle"/>s available in the scene.</summary>
         public List<AssetBundle> Bundles { get; set; }
+        /// <summary>The menu to be displayed for selecting content from AssetBundles.</summary>
         public GameObject menu;
+        // TODO Need to just go ahead and make this a required component 
+        /// <summary>The GameObject containing the ScrollView Component.</summary> 
         public GameObject scrollView;
+        /// <summary> The GameObject containing the Button used to toggle the menu.</summary>
         public GameObject toggleButton;
+        /// <summary>The user-defined preset for extracting ui prefabs from an <see cref="UnityEngine.AssetBundle"/>.</summary>
+        /// <para> This can be used to distinguish between ui elements and game elements. See README for how this is intended to work.</para>
         public string uiAssetPrefix = "ui_";
+        /// <summary>Delegate for <see cref="OnPrefabLoaded" /> event.</summary>
         public delegate void PrefabLoaded(ref GameObject prefab);
+        /// <summary>Event that is fired whenever a prefab is loaded from an <see cref="UnityEngine.AssetBundle" /></summary>
         public event PrefabLoaded OnPrefabLoaded;
-        private int currentMenuId;
+        
         private static readonly object managerLock = new object();
         private static AssetBundleMenuManager _instance;
         private AppManager Manager { get; set; }
@@ -23,7 +32,7 @@ namespace StudioX
         private Button _toggleButton;
         private bool loadingCurrentPrefab;
 
-        ///<summary>Static thread-safe singleton instance of AssetBundleMenuManager</summary>
+        /// <summary>Static thread-safe singleton instance of AssetBundleMenuManager</summary>
         public static AssetBundleMenuManager Instance
         {
             get
