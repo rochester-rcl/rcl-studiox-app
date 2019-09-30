@@ -6,6 +6,9 @@ using UnityEditor;
 namespace StudioX
 {
 #if UNITY_EDITOR
+    /// <summary>
+    /// Custom inspector layout for <see cref="AppManager"/>. Only works in Editor.
+    /// </summary>
     [CustomEditor(typeof(AppManager))]
     public class AppManagerEditorLayout : Editor
     {

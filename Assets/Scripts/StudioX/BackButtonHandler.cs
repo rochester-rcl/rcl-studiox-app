@@ -4,25 +4,26 @@ using UnityEngine;
 using UnityEngine.UI;
 namespace StudioX
 {
+    /// <summary>A basic "back button" to be used with <see cref="AppManager"/>.</summary>
+    [RequireComponent(typeof(Button))]
     public class BackButtonHandler : MonoBehaviour
     {
-        // Start is called before the first frame update
+        /// <summary>The <see cref="AppManager"/> instance in the scene.</summary>
         private AppManager manager;
+        /// <summary>
+        /// The <see cref="UnityEngine.UI.Button"/> attached to <see cref="BackButtonHandler.gameObject"/>.
+        /// </summary>
         private Button button;
+        /// <summary>Initializes <see cref="button"/> and <see cref="manager"/> and adds 
+        /// <see cref="AppManager.LoadMenu"/> as an onClick handler to <see cref="button"/>.
+        /// </summary>
         void Start()
         {
             button = gameObject.GetComponent<Button>();
             manager = AppManager.GetManager();
-            if (!button)
-            {
-                throw new MissingComponentException("BackButtonHandler Requires a Button Component");
-            } 
-            else 
-            {
-                button.onClick.AddListener(manager.LoadMenu);
-            }
+            button.onClick.AddListener(manager.LoadMenu);
         }
-
+        /// <summary>Removes <see cref="AppManager.LoadMenu"/> handler from <see cref="button"/>.</summary>
         public void OnDestroy()
         {
             button.onClick.RemoveListener(manager.LoadMenu);
