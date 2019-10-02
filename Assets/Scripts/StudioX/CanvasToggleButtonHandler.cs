@@ -19,10 +19,11 @@ namespace StudioX
         /// the <see cref="UnityEngine.UI.Button"/> that will show <see cref="targetCanvas"/>.
         /// </summary>
         public GameObject openButtonObject;
-        
+        /// <summary>The <see cref="UnityEngine.UI.Button"/> attached to <see cref="openButtonObject"/>.</summary>
         private Button closeButton;
+        /// <summary>The <see cref="UnityEngine.UI.Button"/> attached to <see cref="openButtonObject"/>.</summary>
         private Button openButton;
-        // Start is called before the first frame update
+        /// <summary>Adds onClick listeners to <see cref="openButton"/> and <see cref="closeButton"/>.</summary>
         void Start()
         {
             openButton = openButtonObject.GetComponent<Button>();
@@ -32,13 +33,17 @@ namespace StudioX
             targetCanvas.SetActive(false);
             closeButtonObject.SetActive(false);
         }
-
+        /// <summary>
+        /// Activates <see cref="targetCanvas"/>, deactivates <see cref="openButtonObject"/> and activates <see cref="closeButtonObject"/>.
+        /// </summary> 
         public void OpenHandler()
         {
             targetCanvas.SetActive(true);
             closeButtonObject.SetActive(true);
         }
-
+        /// <summary>
+        /// Deactivates <see cref="targetCanvas"/>, activates <see cref="openButtonObject"/> and deactivates <see cref="closeButtonObject"/>.
+        /// </summary> 
         public void CloseHandler()
         {
             targetCanvas.SetActive(false);

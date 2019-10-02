@@ -5,29 +5,50 @@ using UnityEngine.UI;
 using UnityEditor;
 namespace StudioX
 {
+    // TODO should change this name because it doesn't reflect what the class actually does
+
+    /// <summary>
+    /// Component for loading a Scene with <see cref="AppManager"/> via a <see cref="UnityEngine.UI.Button"/>.
+    /// </summary> 
+    [RequireComponent(typeof(Button))]
     public class MenuButtonHandler : MonoBehaviour
     {
+        /// <summary>
+        /// The <see cref="UnityEngine.UI.Button"/> to attach <see cref="ClickHandler"/> to.
+        /// </summary>
         public Button MenuButton { get; set; }
+        /// <summary>
+        /// The name of the scene that will be loaded when <see cref="MenuButton"/> is clicked.
+        /// </summary>
         public string sceneName;
+        /// <summary>
+        /// Whether or not the scene to be loaded is a VR scene.
+        /// </summary>
         public bool isVR = false;
+        /// <summary>
+        /// The <see cref="AppManager"/> instance currently loaded in the scene.
+        /// </summary>
         private AppManager Manager { get; set; }
+        /// <summary>
+        /// Initializes <see cref="Manager"/> and <see cref="MenuButton"/>.
+        /// Adds <see cref="ClickHandler"/> to <see cref="MenuButton"/>.
+        /// </summary>
+        /// <exception cref="UnityEngine.MissingComponentException"/>
+        /// Will be thrown if no AppManager instance is present in the scene.
+        /// </exception>
         public void Start()
         {
-            MenuButton = GetComponent<Button>();
+            MenuButton = gameObject.GetComponent<Button>();
             Manager = AppManager.GetManager();
             if (!Manager)
             {
-                Debug.LogError("There must be an instance of AppManager attached to a GameObject in the scene");
+                throw new MissingComponentException("There must be an instance of AppManager attached to a GameObject in the scene");
             }
-            if (MenuButton)
-            {
-                MenuButton.onClick.AddListener(ClickHandler);
-            }
-            else
-            {
-                Debug.LogError("MenuButtonHandler must be attached to a Button component!");
-            }
+            MenuButton.onClick.AddListener(ClickHandler);
         }
+        /// <summary>
+        /// Loads <see cref="sceneName"/> when <see cref="MenuButton" /> is clicked.
+        /// </summary>
         public void ClickHandler()
         {
             if (Manager)
@@ -46,13 +67,26 @@ namespace StudioX
 
 #if UNITY_EDITOR
     [CustomEditor(typeof(MenuButtonHandler))]
+    /// <summary>
+    /// Custom inspector layout for <see cref="MenuButtonHandler"/>. Only works in Editor.
+    /// </summary> 
     public class MenuButtonHandlerEditorLayout : Editor
     {
+        /// <summary>
+        /// The SerializedProperty for <see cref="MenuButtonHandler.sceneName"/>.
+        /// </summary>
         SerializedProperty sceneName;
+        /// <summary> 
+        /// The SerializedProperty for <see cref="MenuButtonHandler.isVR"/>.
+        /// </summary>
         SerializedProperty isVR;
-        [SerializeField]
+        /// <summary>
+        /// The <see cref="UnityEditor.SceneAsset"/> placeholder for <see cref="sceneName"/>.
+        /// </summary>
         private SceneAsset sceneObj;
-
+        /// <summary>
+        /// Initializes all SerializedProperty fields from MenuButtonHandlerEditorLayout.serializedObject.
+        /// </summary>
         void OnEnable()
         {
             sceneName = serializedObject.FindProperty("sceneName");
@@ -63,7 +97,7 @@ namespace StudioX
                 sceneObj = AssetDatabase.LoadAssetAtPath<SceneAsset>(AssetDatabase.GUIDToAssetPath(scenes[0]));
             }
         }
-
+        /// <summary>Sets all of the SerializedProperty fields from the inspector GUI.</summary>
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
