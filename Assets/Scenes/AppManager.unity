@@ -320,6 +320,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7339612608845453930, guid: 60ad6b1216e2fc4de87a007d540f6262,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7339612608476020115, guid: 60ad6b1216e2fc4de87a007d540f6262,
         type: 3}
       propertyPath: m_FontData.m_Font
@@ -514,7 +519,7 @@ MonoBehaviour:
   remoteAssetBundleEndpoint: http://localhost:3000/bundles
   verified: 1
   requestCount: 4
-  checkForNewContentOnStart: 0
+  loadAssetBundlesOnStart: 0
   remoteAssetBundleMaps:
   - assetBundleKey: ARBundles
     appName: studiox-android-ar

@@ -72,6 +72,9 @@
             if (bundleMapper)
             {
                 bundleMapper.UnloadAllBundles();
+                bundleMapper.OnAllAssetBundlesLoaded -= HandleAllAssetBundlesLoaded;
+                bundleMapper.OnManifestLoadingError -= HandleRemoteAssetBundleError;
+                bundleMapper.OnAssetBundleLoadingError -= HandleRemoteAssetBundleError;
             }
         }
 
@@ -80,8 +83,12 @@
             if (remoteAssetBundleMapper)
             {
                 bundleMapper = remoteAssetBundleMapper.GetComponent<RemoteAssetBundleMapper>();
-                yield return FadeAsync(true, true);
+                bundleMapper.ToggleProgressBar(false);
+                yield return FadeAsync(true);
+                bundleMapper.ToggleProgressBar(true);
                 bundleMapper.OnAllAssetBundlesLoaded += HandleAllAssetBundlesLoaded;
+                bundleMapper.OnManifestLoadingError += HandleRemoteAssetBundleError;
+                bundleMapper.OnAssetBundleLoadingError += HandleRemoteAssetBundleError;
                 bundleMapper.GetUpdatedContent();
             }
         }
@@ -93,6 +100,12 @@
                 LoadedBundles[map.assetBundleKey] = map.Bundles;
             }
             StartCoroutine(TransitionToLanding());
+        }
+
+        private void HandleRemoteAssetBundleError(string message)
+        {
+            // SHOW BUTTONS TO RETRY OR SKIP HERE
+
         }
 
         private IEnumerator TransitionToLanding()
