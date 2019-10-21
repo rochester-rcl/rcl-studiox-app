@@ -2756,6 +2756,7 @@ MonoBehaviour:
   scrollView: {fileID: 2922241235614763773}
   toggleButton: {fileID: 238809679}
   uiAssetPrefix: ui_
+  appManagerBundleKey: ARBundles
 --- !u!4 &837406608
 Transform:
   m_ObjectHideFlags: 0

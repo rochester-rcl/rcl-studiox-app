@@ -13,6 +13,7 @@ namespace StudioX
         public GameObject scrollView;
         public GameObject toggleButton;
         public string uiAssetPrefix = "ui_";
+        public string appManagerBundleKey;
         public delegate void PrefabLoaded(ref GameObject prefab);
         public event PrefabLoaded OnPrefabLoaded;
         private int currentMenuId;
@@ -62,7 +63,7 @@ namespace StudioX
             }
             else
             {
-                Bundles = Manager.ARBundles;
+                Bundles = Manager.LoadedBundles[appManagerBundleKey];
             }
             InitMenu();
             InitToggleButton();

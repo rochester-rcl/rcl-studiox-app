@@ -15,7 +15,7 @@ namespace StudioX
         SerializedProperty menuScene;
         private SceneAsset menuSceneObj;
         SerializedProperty firebaseMessagingTopic;
-        private const string EditorPrefsKey = "AppManagerEditorLayoutKey";
+        public SerializedProperty remoteAssetBundleMapper;
         public void OnEnable()
         {
             landingScene = serializedObject.FindProperty("landingScene");
@@ -24,6 +24,7 @@ namespace StudioX
             menuScene = serializedObject.FindProperty("menuScene");
             menuSceneObj = LoadSceneAsset(menuScene.stringValue);
             firebaseMessagingTopic = serializedObject.FindProperty("firebaseMessagingTopic");
+            remoteAssetBundleMapper = serializedObject.FindProperty("remoteAssetBundleMapper");
         }
 
         private SceneAsset LoadSceneAsset(string sceneName)
@@ -67,6 +68,9 @@ namespace StudioX
             {
                 menuScene.stringValue = null;
             }
+
+            /*** REMOTE ASSET BUNDLE MAPPER ***/
+            EditorGUILayout.PropertyField(remoteAssetBundleMapper);
 
             firebaseMessagingTopic.stringValue = EditorGUILayout.TextField("Firebase Messaging Topic", firebaseMessagingTopic.stringValue);
 
