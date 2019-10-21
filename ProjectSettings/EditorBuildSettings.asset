@@ -28,7 +28,10 @@ EditorBuildSettings:
     guid: c341e5d34906abeb995b2567cafa78a8
   - enabled: 0
     path: 
-    guid: bb36d2905dc634f1c9eecb35beecaca8
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: Assets/Scenes/VR_Local_Main.unity
+    guid: a0c5fa23cff9d481c92f74e1cba7d9fc
   - enabled: 0
     path: Assets/Scenes/AR_Main_2.unity
     guid: abb1b0ef68f6a40998731abfb6de8e8c
