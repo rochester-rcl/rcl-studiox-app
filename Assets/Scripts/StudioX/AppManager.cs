@@ -32,6 +32,7 @@
         public string landingScene;
         public int landingDuration = 3;
         public GameObject loadingScreen;
+        public GameObject errorScreen;
         public string menuScene;
         public GameObject remoteAssetBundleMapper;
 
@@ -60,6 +61,7 @@
         public void Start()
         {
             InitLoadingScreen();
+            InitErrorScreen();
             InitFirebase();
             StartCoroutine(CheckForRemoteContent());
             LoadedBundles = new Dictionary<string, List<AssetBundle>>();
@@ -72,7 +74,8 @@
             if (bundleMapper)
             {
                 bundleMapper.UnloadAllBundles();
-                bundleMapper.OnAllAssetBundlesLoaded -= HandleAllAssetBundlesLoaded;
+                bundleMapper.OnAllLocalAssetBundlesLoaded -= HandleAllAssetBundlesLoaded;
+                bundleMapper.OnAllRemoteAssetBundlesLoaded -= HandleAllAssetBundlesLoaded;
                 bundleMapper.OnManifestLoadingError -= HandleRemoteAssetBundleError;
                 bundleMapper.OnAssetBundleLoadingError -= HandleRemoteAssetBundleError;
             }
@@ -86,7 +89,9 @@
                 bundleMapper.ToggleProgressBar(false);
                 yield return FadeAsync(true);
                 bundleMapper.ToggleProgressBar(true);
-                bundleMapper.OnAllAssetBundlesLoaded += HandleAllAssetBundlesLoaded;
+                bundleMapper.OnAllLocalAssetBundlesLoaded += HandleAllAssetBundlesLoaded;
+                bundleMapper.OnAllRemoteAssetBundlesLoaded += HandleAllAssetBundlesLoaded;
+                bundleMapper.OnGetUpdatedContentSuccess += DisplayLanding;
                 bundleMapper.OnManifestLoadingError += HandleRemoteAssetBundleError;
                 bundleMapper.OnAssetBundleLoadingError += HandleRemoteAssetBundleError;
                 bundleMapper.GetUpdatedContent();
@@ -97,15 +102,16 @@
         {
             foreach(RemoteAssetBundleMapper.RemoteAssetBundleMap map in bundleMapper.remoteAssetBundleMaps)
             {
-                LoadedBundles[map.assetBundleKey] = map.Bundles;
+                LoadedBundles[map.assetBundleKey] = map.AllBundles();
             }
-            StartCoroutine(TransitionToLanding());
         }
 
         private void HandleRemoteAssetBundleError(string message)
         {
-            // SHOW BUTTONS TO RETRY OR SKIP HERE
-
+            if (errorScreen)
+            {
+                errorScreen.SetActive(true);
+            }
         }
 
         private IEnumerator TransitionToLanding()
@@ -136,6 +142,14 @@
                 {
                     ToggleLoadingScreen(true);
                 }
+            }
+        }
+
+        public void InitErrorScreen()
+        {
+            if (errorScreen)
+            {
+                errorScreen.SetActive(false);
             }
         }
 
@@ -178,6 +192,15 @@
                 CurrentAppState = AppState.Landing;
                 ToggleLoadingScreen(true);
                 Debug.Log("No Landing Scene Set for App Manager. Showing Loading Screen Instead.");
+            }
+        }
+
+        public void RetryGetUpdatedContent()
+        {
+            if (bundleMapper)
+            {
+                bundleMapper.UnloadAllBundles();
+                bundleMapper.GetUpdatedContent();
             }
         }
 

@@ -9,18 +9,20 @@ namespace StudioX
     [CustomEditor(typeof(AppManager))]
     public class AppManagerEditorLayout : Editor
     {
-        SerializedProperty landingScene;
+        public SerializedProperty landingScene;
         private SceneAsset landingSceneObj;
-        SerializedProperty loadingScreen;
-        SerializedProperty menuScene;
+        public SerializedProperty loadingScreen;
+        public SerializedProperty errorScreen;
+        public SerializedProperty menuScene;
         private SceneAsset menuSceneObj;
-        SerializedProperty firebaseMessagingTopic;
+        public SerializedProperty firebaseMessagingTopic;
         public SerializedProperty remoteAssetBundleMapper;
         public void OnEnable()
         {
             landingScene = serializedObject.FindProperty("landingScene");
             landingSceneObj = LoadSceneAsset(landingScene.stringValue);
             loadingScreen = serializedObject.FindProperty("loadingScreen");
+            errorScreen = serializedObject.FindProperty("errorScreen");
             menuScene = serializedObject.FindProperty("menuScene");
             menuSceneObj = LoadSceneAsset(menuScene.stringValue);
             firebaseMessagingTopic = serializedObject.FindProperty("firebaseMessagingTopic");
@@ -57,6 +59,9 @@ namespace StudioX
 
             /*** LOADING SCREEN ***/
             EditorGUILayout.PropertyField(loadingScreen);
+
+            /*** Error SCREEN ***/
+            EditorGUILayout.PropertyField(errorScreen);
 
             /*** MENU SCENE ***/
             menuSceneObj = EditorGUILayout.ObjectField("Menu Scene", menuSceneObj, typeof(SceneAsset), true) as SceneAsset;
