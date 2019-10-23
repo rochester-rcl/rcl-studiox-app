@@ -15,8 +15,10 @@ namespace StudioX
         public SerializedProperty errorScreen;
         public SerializedProperty menuScene;
         private SceneAsset menuSceneObj;
-        public SerializedProperty firebaseMessagingTopic;
+        private Rect lastRect;
+        public SerializedProperty firebaseMessagingTopics;
         public SerializedProperty remoteAssetBundleMapper;
+        public SerializedProperty fbTopicArraySize;
         public void OnEnable()
         {
             landingScene = serializedObject.FindProperty("landingScene");
@@ -25,7 +27,8 @@ namespace StudioX
             errorScreen = serializedObject.FindProperty("errorScreen");
             menuScene = serializedObject.FindProperty("menuScene");
             menuSceneObj = LoadSceneAsset(menuScene.stringValue);
-            firebaseMessagingTopic = serializedObject.FindProperty("firebaseMessagingTopic");
+            firebaseMessagingTopics = serializedObject.FindProperty("firebaseMessagingTopics");
+            fbTopicArraySize = firebaseMessagingTopics.FindPropertyRelative("Array.size");
             remoteAssetBundleMapper = serializedObject.FindProperty("remoteAssetBundleMapper");
         }
 
@@ -40,6 +43,50 @@ namespace StudioX
             {
                 return null;
             }
+        }
+
+        private void DrawFirebaseTopicSelector()
+        {
+            GUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.LabelField("Firebase Cloud Messaging Topics");
+            EditorGUILayout.Space();
+            {
+                if (GUILayout.Button("Add", GUILayout.Width(100)))
+                {
+                    fbTopicArraySize.intValue++;
+                }
+                EditorGUILayout.Space();
+                for (int i = 0; i < fbTopicArraySize.intValue; i++)
+                {
+                    SerializedProperty fbMessagingTopic = firebaseMessagingTopics.GetArrayElementAtIndex(i);
+                    GUILayout.BeginHorizontal();
+                    {
+                        fbMessagingTopic.stringValue = EditorGUILayout.TextField(fbMessagingTopic.stringValue);
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button("Remove"))
+                        {
+                            firebaseMessagingTopics.DeleteArrayElementAtIndex(i);
+                        }
+                    }
+                    GUILayout.EndHorizontal();
+                    if (i % 2 == 0)
+                    {
+                        DrawSeparator();
+                    }
+                    GUILayout.Space(10);
+                }
+            }
+            GUILayout.EndHorizontal();
+        }
+
+        public void DrawSeparator()
+        {
+            lastRect = GUILayoutUtility.GetLastRect();
+            float h = lastRect.height;
+            lastRect.y = (lastRect.y + h) + 5;
+            lastRect.height = 1;
+            EditorGUI.DrawRect(lastRect, Color.gray);
+            GUILayout.Space(10);
         }
 
         public override void OnInspectorGUI()
@@ -76,8 +123,8 @@ namespace StudioX
 
             /*** REMOTE ASSET BUNDLE MAPPER ***/
             EditorGUILayout.PropertyField(remoteAssetBundleMapper);
-
-            firebaseMessagingTopic.stringValue = EditorGUILayout.TextField("Firebase Messaging Topic", firebaseMessagingTopic.stringValue);
+            DrawFirebaseTopicSelector();
+            // firebaseMessagingTopic.stringValue = EditorGUILayout.TextField("Firebase Messaging Topic", firebaseMessagingTopic.stringValue);
 
             serializedObject.ApplyModifiedProperties();
         }

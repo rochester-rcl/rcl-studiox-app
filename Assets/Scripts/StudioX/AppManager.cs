@@ -39,7 +39,7 @@
         ///<summary>The optional name of the Firebase Messaging Topic the app will subscribe to.false Defaults to an empty string.
         ///<para><see cref="Firebase.Messaging.FirebaseMessaging.SubscribeAsync(string)"/> for more details</para> 	
         ///</summary>
-        public string firebaseMessagingTopic;
+        public string[] firebaseMessagingTopics;
 
         ///<summary>Static thread-safe singleton instance of AppManager</summary>
         public static AppManager Instance
@@ -65,8 +65,6 @@
             InitFirebase();
             StartCoroutine(CheckForRemoteContent());
             LoadedBundles = new Dictionary<string, List<AssetBundle>>();
-            // DisplayLanding();
-            // StartCoroutine(LoadLocalAssetBundles());
         }
 
         public void OnDestroy()
@@ -85,6 +83,7 @@
         {
             if (remoteAssetBundleMapper)
             {
+                yield return FadeAsync(false);
                 bundleMapper = remoteAssetBundleMapper.GetComponent<RemoteAssetBundleMapper>();
                 bundleMapper.ToggleProgressBar(false);
                 yield return FadeAsync(true);
@@ -487,7 +486,7 @@
             {
                 Firebase.Messaging.FirebaseMessaging.TokenReceived += OnTokenReceived;
                 Firebase.Messaging.FirebaseMessaging.MessageReceived += OnMessageReceived;
-                if (!string.IsNullOrWhiteSpace(firebaseMessagingTopic))
+                /*if (!string.IsNullOrWhiteSpace(firebaseMessagingTopic))
                 {
                     string fbTopic = firebaseMessagingTopic.ToLower().Replace(" ", "-");
                     Debug.Log(string.Format("Subscribing to topic {0}", fbTopic));
@@ -495,7 +494,7 @@
                     {
                         LogTaskStatus(task, "SubscribeAsync");
                     });
-                }
+                }*/
 
             }
             else

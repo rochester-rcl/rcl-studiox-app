@@ -1913,14 +1913,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23c9354b3b3d54a7da772c9da1eb10d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  remoteAssetBundleEndpoint: http://localhost:3000/bundles
+  remoteAssetBundleEndpoint: https://dslab.lib.rochester.edu/uas/bundles
   verified: 1
   requestCount: 4
   loadAssetBundlesOnStart: 0
   remoteAssetBundleMaps:
   - assetBundleKey: ARBundles
     appName: studiox-android-ar
-    displayName: AR App
+    displayName: Studio X AR Experience
     localAssetBundles:
     - foxyboiassets.unity3d
     - groundboiassets.unity3d
@@ -1939,6 +1939,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   progressObj: {fileID: 7339612609135191976}
   messageObj: {fileID: 7339612608699154519}
+  progressContainer: {fileID: 280222218}
   active: 1
 --- !u!4 &1652181650
 Transform:
