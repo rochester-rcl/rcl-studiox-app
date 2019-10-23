@@ -48,7 +48,8 @@ namespace StudioX
         private void DrawFirebaseTopicSelector()
         {
             GUILayout.BeginVertical(EditorStyles.helpBox);
-            EditorGUILayout.LabelField("Firebase Cloud Messaging Topics");
+            EditorGUILayout.LabelField("Firebase Cloud Messaging Topics", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Note: all topics must be lower case and have no spaces or special characters.");
             EditorGUILayout.Space();
             {
                 if (GUILayout.Button("Add", GUILayout.Width(100)))

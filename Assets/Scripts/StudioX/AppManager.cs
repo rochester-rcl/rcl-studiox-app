@@ -99,7 +99,7 @@
 
         private void HandleAllAssetBundlesLoaded()
         {
-            foreach(RemoteAssetBundleMapper.RemoteAssetBundleMap map in bundleMapper.remoteAssetBundleMaps)
+            foreach (RemoteAssetBundleMapper.RemoteAssetBundleMap map in bundleMapper.remoteAssetBundleMaps)
             {
                 LoadedBundles[map.assetBundleKey] = map.AllBundles();
             }
@@ -125,7 +125,7 @@
             {
                 loadingScreenCanvases = new List<Canvas>();
                 loadingScreen = Instantiate(loadingScreen, new Vector3(0, 0, 0), Quaternion.identity);
-                foreach(Transform child in loadingScreen.transform)
+                foreach (Transform child in loadingScreen.transform)
                 {
                     Canvas canvas = child.gameObject.GetComponent<Canvas>();
                     if (canvas)
@@ -235,20 +235,6 @@
             Coroutine fadeIn = StartCoroutine(FadeAsync(true, true));
             yield return fadeIn;
         }
-
-        /*private IEnumerator LoadLocalAssetBundles()
-        {
-            ARBundles = new List<AssetBundle>();
-            // I wonder if this has to be done on the main thread or if they can be done in parallel
-            foreach (string bundlePath in arBundleNames)
-            {
-                string absPath = Path.Combine(Application.streamingAssetsPath, bundlePath);
-                var bundleRequest = AssetBundle.LoadFromFileAsync(absPath);
-                yield return bundleRequest;
-                AssetBundle b = bundleRequest.assetBundle;
-                if (b) ARBundles.Add(b);
-            }
-        }*/
 
         private IEnumerator LoadAsyncScene(string sceneName, bool showLoadingScreen = true)
         {
@@ -486,20 +472,30 @@
             {
                 Firebase.Messaging.FirebaseMessaging.TokenReceived += OnTokenReceived;
                 Firebase.Messaging.FirebaseMessaging.MessageReceived += OnMessageReceived;
-                /*if (!string.IsNullOrWhiteSpace(firebaseMessagingTopic))
+                if (firebaseMessagingTopics.Length > 0)
                 {
-                    string fbTopic = firebaseMessagingTopic.ToLower().Replace(" ", "-");
+                    SubscribeToMessagingTopics();
+                }
+            }
+            else
+            {
+                Debug.Log("Could not initialize Firebase event handlers");
+            }
+        }
+
+        private void SubscribeToMessagingTopics()
+        {
+            foreach (string topic in firebaseMessagingTopics)
+            {
+                if (!string.IsNullOrWhiteSpace(topic))
+                {
+                    string fbTopic = topic.ToLower().Replace(" ", "-");
                     Debug.Log(string.Format("Subscribing to topic {0}", fbTopic));
                     Firebase.Messaging.FirebaseMessaging.SubscribeAsync(fbTopic).ContinueWith(task =>
                     {
                         LogTaskStatus(task, "SubscribeAsync");
                     });
-                }*/
-
-            }
-            else
-            {
-                Debug.Log("Could not initialize Firebase event handlers");
+                }
             }
         }
 
