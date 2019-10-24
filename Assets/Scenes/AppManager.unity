@@ -790,7 +790,7 @@ MonoBehaviour:
   menuScene: Menu_Main
   remoteAssetBundleMapper: {fileID: 1652181647}
   firebaseMessagingTopics:
-  - studiox-android-ar-dev
+  - studiox-android-ar
 --- !u!1 &584091805
 GameObject:
   m_ObjectHideFlags: 0
@@ -1920,7 +1920,7 @@ MonoBehaviour:
   loadAssetBundlesOnStart: 0
   remoteAssetBundleMaps:
   - assetBundleKey: ARBundles
-    appName: studiox-android-ar-dev
+    appName: studiox-android-ar
     displayName: Studio X AR Experience
     localAssetBundles:
     - foxyboiassets.unity3d
