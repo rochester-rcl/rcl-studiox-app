@@ -750,7 +750,7 @@ GameObject:
   - component: {fileID: 551548610}
   - component: {fileID: 551548611}
   m_Layer: 0
-  m_Name: AppManager
+  m_Name: AppManagerAndroid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -791,6 +791,7 @@ MonoBehaviour:
   remoteAssetBundleMapper: {fileID: 1652181647}
   firebaseMessagingTopics:
   - studiox-android-ar
+  - studiox-android-vr
 --- !u!1 &584091805
 GameObject:
   m_ObjectHideFlags: 0
@@ -1407,6 +1408,83 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &1379375694
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1379375697}
+  - component: {fileID: 1379375696}
+  - component: {fileID: 1379375695}
+  m_Layer: 0
+  m_Name: RemoteAssetBundleMapperIOS
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1379375695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1379375694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23c9354b3b3d54a7da772c9da1eb10d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  remoteAssetBundleEndpoint: https://dslab.lib.rochester.edu/uas/bundles
+  verified: 1
+  requestCount: 4
+  loadAssetBundlesOnStart: 0
+  remoteAssetBundleMaps:
+  - assetBundleKey: ARBundles
+    appName: studiox-ios-ar
+    displayName: Studio X AR Experience
+    localAssetBundles:
+    - foxyboiassets.unity3d
+    - groundboiassets.unity3d
+    - melioraassets.unity3d
+  - assetBundleKey: VRBundles
+    appName: studiox-ios-vr
+    displayName: Studio X VR Experience
+    localAssetBundles:
+    - quadvideorockyassets.unity3d
+--- !u!114 &1379375696
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1379375694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f789a58bb8e62a0cab65ff9d449663c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  progressObj: {fileID: 7339612609135191976}
+  messageObj: {fileID: 7339612608699154519}
+  progressContainer: {fileID: 280222218}
+  active: 1
+--- !u!4 &1379375697
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1379375694}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 540, y: 476.25, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1416081515
 GameObject:
   m_ObjectHideFlags: 0
@@ -1700,6 +1778,58 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1518040184}
   m_CullTransparentMesh: 0
+--- !u!1 &1550247978
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1550247980}
+  - component: {fileID: 1550247979}
+  m_Layer: 0
+  m_Name: AppManagerIOS
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1550247979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1550247978}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb40233b874d64b79b454261362ba62a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  landingScene: LandingScene_Main
+  landingDuration: 6
+  loadingScreen: {fileID: 5798456085927286972, guid: 08116eab829f31c6580579906d1ba696,
+    type: 3}
+  errorScreen: {fileID: 422553224}
+  menuScene: Menu_Main
+  remoteAssetBundleMapper: {fileID: 1652181647}
+  firebaseMessagingTopics:
+  - studiox-android-ar
+--- !u!4 &1550247980
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1550247978}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1223.8955, y: 276, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1559239669
 GameObject:
   m_ObjectHideFlags: 0
@@ -1896,7 +2026,7 @@ GameObject:
   - component: {fileID: 1652181649}
   - component: {fileID: 1652181648}
   m_Layer: 0
-  m_Name: RemoteAssetBundleMapper
+  m_Name: RemoteAssetBundleMapperAndroid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1915,7 +2045,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   remoteAssetBundleEndpoint: https://dslab.lib.rochester.edu/uas/bundles
-  verified: 1
+  verified: 0
   requestCount: 4
   loadAssetBundlesOnStart: 0
   remoteAssetBundleMaps:
@@ -1926,6 +2056,11 @@ MonoBehaviour:
     - foxyboiassets.unity3d
     - groundboiassets.unity3d
     - melioraassets.unity3d
+  - assetBundleKey: VRBundles
+    appName: studiox-android-vr
+    displayName: Studio X VR Experience
+    localAssetBundles:
+    - quadvideorockyassets.unity3d
 --- !u!114 &1652181649
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2471,7 +2606,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\x13"
+  m_Text: Initializing ...
 --- !u!224 &7339612608699154518
 RectTransform:
   m_ObjectHideFlags: 0

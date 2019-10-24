@@ -290,13 +290,14 @@
             yield return coroutine;
         }
 
-        private IEnumerator EnableVR()
+        public IEnumerator EnableVR()
         {
             if (string.Compare(XRSettings.loadedDeviceName, VRDevice, true) != 0)
             {
                 XRSettings.LoadDeviceByName(VRDevice);
                 yield return null;
             }
+            CurrentAppState = AppState.VR;
             XRSettings.enabled = true;
         }
 

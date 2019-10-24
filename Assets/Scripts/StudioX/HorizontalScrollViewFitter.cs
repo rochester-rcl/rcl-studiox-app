@@ -53,9 +53,16 @@ namespace StudioX
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            targetTransformObj = EditorGUILayout.ObjectField(targetTransformObj, typeof(GameObject), true) as GameObject;
-            targetTransformName.stringValue = targetTransformObj.name;
-            serializedObject.ApplyModifiedProperties();
+            if (targetTransformObj)
+            {
+                targetTransformObj = EditorGUILayout.ObjectField(targetTransformObj, typeof(GameObject), true) as GameObject;
+                targetTransformName.stringValue = targetTransformObj.name;
+                serializedObject.ApplyModifiedProperties();
+            }
+            else
+            {
+                EditorGUILayout.LabelField(string.Format("Target Transform: {0}", targetTransformName.stringValue));
+            }
         }
     }
     #endif

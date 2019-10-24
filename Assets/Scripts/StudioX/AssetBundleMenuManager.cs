@@ -14,6 +14,7 @@ namespace StudioX
         public GameObject toggleButton;
         public string uiAssetPrefix = "ui_";
         public string appManagerBundleKey;
+        public bool VRScene = false;
         public delegate void PrefabLoaded(ref GameObject prefab);
         public event PrefabLoaded OnPrefabLoaded;
         private int currentMenuId;
@@ -66,7 +67,10 @@ namespace StudioX
                 Bundles = Manager.LoadedBundles[appManagerBundleKey];
             }
             InitMenu();
-            InitToggleButton();
+            if (toggleButton)
+            {
+                InitToggleButton();
+            }
             StartCoroutine(InitCells());
         }
 
@@ -75,12 +79,12 @@ namespace StudioX
             if (menu.activeSelf)
             {
                 menu.SetActive(false);
-                toggleButton.SetActive(true);
+                if (toggleButton) toggleButton.SetActive(true);
             }
             else
             {
                 menu.SetActive(true);
-                toggleButton.SetActive(false);
+                if (toggleButton) toggleButton.SetActive(false);
             }
         }
         // TODO add animated loader while this runs
@@ -118,7 +122,9 @@ namespace StudioX
             AssetBundleNameSelector selector = cloned.GetComponent<AssetBundleNameSelector>();
             if (selector)
             {
-                selector.SetCallback((string assetName) => { HandleMenuItemClick(bundleName, assetName); });
+                selector.SetCallback((string assetName) => { 
+                    HandleMenuItemClick(bundleName, assetName); 
+                });
             }
             cloned.transform.SetParent(scrollViewContainer);
             cloned.transform.localScale = Vector3.one;
@@ -129,10 +135,19 @@ namespace StudioX
         private void HandleMenuItemClick(string bundleName, string assetName)
         {
             // Prevent people from continually tapping on the button multiple times and starting a bunch of coroutines
-            if (!loadingCurrentPrefab)
+            if (!loadingCurrentPrefab && !VRScene)
             {
                 StartCoroutine(LoadCurrentGameObjectFromBundle(bundleName, assetName));
             }
+            else if (!loadingCurrentPrefab && VRScene)
+            {
+                StartCoroutine(LoadCurrentVRGameObjectFromBundle(bundleName, assetName));
+            }
+        }
+        private IEnumerator LoadCurrentVRGameObjectFromBundle(string bundleName, string assetName)
+        {
+            yield return LoadCurrentGameObjectFromBundle(bundleName, assetName);
+            yield return Manager.EnableVR();
         }
 
         private IEnumerator LoadCurrentGameObjectFromBundle(string bundleName, string assetName)
@@ -150,9 +165,9 @@ namespace StudioX
                     {
                         OnPrefabLoaded(ref go);
                     }
-                    loadingCurrentPrefab = false;
                     ToggleMenu();
                 }
+                loadingCurrentPrefab = false;
             }
         }
 
