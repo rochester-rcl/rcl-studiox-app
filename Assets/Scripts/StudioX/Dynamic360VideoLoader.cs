@@ -2,14 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using RenderHeads.Media.AVProVideo;
+using Vimeo.Player;
 namespace StudioX
 {
     public class Dynamic360VideoLoader : MonoBehaviour
     {
         public GameObject sphere;
         private GameObject CurrentObject { get; set; }
-        private AssetBundleMenuManager MenuManager { get; set; }
+        public AssetBundleMenuManager MenuManager { get; set; }
         private ApplyToMesh meshApplier;
+        private MediaPlayer player;
+        private VimeoPlayer vimeoPlayer;
+        private AssetBundleVimeoTokenStorage storage;
         public void Start()
         {
             MenuManager = AssetBundleMenuManager.GetManager();
@@ -38,9 +42,23 @@ namespace StudioX
             AddPlayerToSphere();
         }
 
-        public void AddPlayerToSphere()
+        private void UpdateSpherePlayerSource()
         {
-            MediaPlayer player = FindObjectOfType<MediaPlayer>();
+            storage = FindObjectOfType<AssetBundleVimeoTokenStorage>();
+            vimeoPlayer = FindObjectOfType<VimeoPlayer>();
+            vimeoPlayer.autoPlay = false;
+            vimeoPlayer.buildMode = true;
+            vimeoPlayer.vimeoToken = storage.VimeoToken;
+            vimeoPlayer.OnStart += () => {
+                vimeoPlayer.LoadVideo(); 
+            };
+            vimeoPlayer.OnVideoMetadataLoad += () => { vimeoPlayer.autoPlay = true; vimeoPlayer.Play(); };
+            player = FindObjectOfType<MediaPlayer>();
+        }
+
+        private void AddPlayerToSphere()
+        {
+            UpdateSpherePlayerSource();
             meshApplier.Player = player;
         }
     }

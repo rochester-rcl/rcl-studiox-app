@@ -1813,9 +1813,10 @@ MonoBehaviour:
     type: 3}
   errorScreen: {fileID: 422553224}
   menuScene: Menu_Main
-  remoteAssetBundleMapper: {fileID: 1652181647}
+  remoteAssetBundleMapper: {fileID: 1379375694}
   firebaseMessagingTopics:
-  - studiox-android-ar
+  - studiox-ios-ar
+  - studiox-ios-vr
 --- !u!4 &1550247980
 Transform:
   m_ObjectHideFlags: 0
@@ -2045,7 +2046,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   remoteAssetBundleEndpoint: https://dslab.lib.rochester.edu/uas/bundles
-  verified: 0
+  verified: 1
   requestCount: 4
   loadAssetBundlesOnStart: 0
   remoteAssetBundleMaps:

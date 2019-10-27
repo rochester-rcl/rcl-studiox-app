@@ -235,7 +235,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Explore the Eastman Quad through Rocky's eyes
+  m_Text: Explore VR content created at UR
 --- !u!222 &62988531
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3585,7 +3585,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d78780061b43dce40bcd69b2098432f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  url: https://rbscpexhibits.lib.rochester.edu/vr-quad
+  url: https://www.rochester.edu/advancement/studiox/
 --- !u!1 &1671015773
 GameObject:
   m_ObjectHideFlags: 0
@@ -3656,7 +3656,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Explore the Eastman Quad through Rocky's eyes
+  m_Text: Explore VR content created at UR
 --- !u!222 &1671015776
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4665,7 +4665,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d78780061b43dce40bcd69b2098432f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  url: https://rbscpexhibits.lib.rochester.edu/vr-quad
+  url: https://www.rochester.edu/advancement/studiox/
 --- !u!1 &2135770227
 GameObject:
   m_ObjectHideFlags: 0
