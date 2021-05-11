@@ -34,10 +34,12 @@ namespace StudioX
             {
                 if (!isVR)
                 {
+                  
                     Manager.LoadScene(sceneName);
                 }
                 else
                 {
+                    
                     Manager.LoadVRScene(sceneName);
                 }
             }
