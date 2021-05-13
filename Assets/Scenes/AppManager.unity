@@ -782,7 +782,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb40233b874d64b79b454261362ba62a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  landingScene: LandingScene_Main
+  landingScene: Menu_Main
   landingDuration: 6
   loadingScreen: {fileID: 5798456085927286972, guid: 08116eab829f31c6580579906d1ba696,
     type: 3}
