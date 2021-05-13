@@ -35,12 +35,26 @@ public class UploadManager : MonoBehaviour
            else
                path = dir;
        }, fileTypes);
-       obj.ImportModelAsync("Your Object", pathSettings.RootPath + path, null, importOptions);
+       if(ValidModelType(path)){
+            obj.ImportModelAsync("Your Object", pathSettings.RootPath + path, null, importOptions);
+       }
+       else{
+           Debug.LogError("Wrong file type/no file selected");
+       }
+      
 
     }
     public string[] allowedFileTypes()
     {
-        string[] filetypes = { NativeFilePicker.ConvertExtensionToFileType("obj") };
+        string[] filetypes = { "*/*" };
         return filetypes;
+    }
+    public bool ValidModelType(string path){
+        if(!path.EndsWith("obj")){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 }
