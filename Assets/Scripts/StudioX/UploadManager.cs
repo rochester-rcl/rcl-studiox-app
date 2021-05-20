@@ -15,6 +15,7 @@ public class UploadManager : MonoBehaviour
     private PathSettings pathSettings;
     private ImportOptions importOptions = new ImportOptions();
     public TextMeshProUGUI text;
+    public GameObject raycast;
     void Start()
     {
         fileTypes = allowedFileTypes();
@@ -23,12 +24,9 @@ public class UploadManager : MonoBehaviour
         importOptions.modelScaling = 0.3f; //For debug now, seems to spawn big
         importOptions.localPosition = new Vector3(0, 0, 10f);//Spawns on camera, moving it forward
     }
-    void Update()
-    {
-
-    }
     public void SelectModelFile()
     {
+        //TODO add iphone functionality. Server sided conversion to glTF and imported on runtime instead of just obj importer.
         if (NativeFilePicker.IsFilePickerBusy()) //checiking if currently picking file
             return;
         NativeFilePicker.RequestPermission(); //asking permission if not given
@@ -43,8 +41,9 @@ public class UploadManager : MonoBehaviour
            {
                obj.ImportModelAsync("Your Object", pathSettings.RootPath + path, null, importOptions); //import obj
 
-               MeshControl meshC = gameObject.GetComponent<MeshControl>();
-               meshC.meshAdded = true; //calling the mesh added function, to be replaced with old controls
+               MeshControlMain mcm = raycast.GetComponent<MeshControlMain>();
+               mcm.meshAdded = true;
+
            }
            else
            {

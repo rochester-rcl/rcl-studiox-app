@@ -9,6 +9,10 @@ public class MeshControl : MonoBehaviour
     
     void Update(){
         game = GameObject.Find("Your Object");
+        if(meshAdded){
+            meshAdded = false;
+            
+        }
         
     }
     public void MoveMeshLeft(){
