@@ -8,6 +8,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using StudioX;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(ARRaycastManager))]
 public class MeshControlMain : MonoBehaviour
@@ -39,7 +40,7 @@ public class MeshControlMain : MonoBehaviour
     private float scale_factor = 0.001f;
     private float position_factor = 0.1f;
 
-    private float min_scale_value = 0.1f;
+    private float min_scale_value = 0.05f;
     private float max_scale_value = 1000.0f;
 
     private Vector3 prevObjPos = Vector3.zero;
@@ -53,7 +54,7 @@ public class MeshControlMain : MonoBehaviour
         m_SessionOrigin = GetComponent<ARSessionOrigin>();
 
     }
-
+    public Text text;
     void Update()
     {
         if (meshAdded)
@@ -64,7 +65,7 @@ public class MeshControlMain : MonoBehaviour
 
             if (Input.touchCount == 2)
             {
-                Debug.Log("here");
+                text.text = "detected pinch";
                 Touch touch0 = Input.GetTouch(0);
                 Touch touch1 = Input.GetTouch(1);
 
@@ -106,7 +107,7 @@ public class MeshControlMain : MonoBehaviour
                     // Raycast hits are sorted by distance, so the first one
                     // will be the closest hit.
                     var hitPose = s_Hits[0].pose;
-
+                    text.text = "detected press";
                     raycastHit = hitPose.position;
 
                     if (spawnedObject == null)
