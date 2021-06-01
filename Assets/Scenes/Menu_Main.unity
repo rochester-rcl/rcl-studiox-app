@@ -623,7 +623,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aef25e103d8e11608862e8636584ead5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneName: AR_Dummy_Main
+  sceneName: AR_DragDrop
   isVR: 0
 --- !u!114 &261964456
 MonoBehaviour:
@@ -937,7 +937,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aef25e103d8e11608862e8636584ead5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneName: AR_Dummy_Main
+  sceneName: AR_DragDrop
   isVR: 0
 --- !u!1 &373084184
 GameObject:

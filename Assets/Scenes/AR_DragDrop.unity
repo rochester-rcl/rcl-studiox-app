@@ -756,7 +756,7 @@ GameObject:
   - component: {fileID: 1521209313}
   - component: {fileID: 1521209312}
   m_Layer: 5
-  m_Name: Button
+  m_Name: UploadButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -888,12 +888,12 @@ GameObject:
   - component: {fileID: 1687482333}
   - component: {fileID: 1687482332}
   m_Layer: 5
-  m_Name: Text
+  m_Name: DebugText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1687482331
 RectTransform:
   m_ObjectHideFlags: 0

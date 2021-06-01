@@ -12,7 +12,7 @@ namespace NativeFilePickerNamespace
 	public class NativeFilePickerPostProcessBuild
 	{
 		private const bool AUTO_SETUP_FRAMEWORKS = true; // Automatically adds MobileCoreServices and CloudKit frameworks to the generated Xcode project
-		private const bool AUTO_SETUP_ICLOUD = false; // Automatically enables iCloud capability of the generated Xcode project
+		private const bool AUTO_SETUP_ICLOUD = true; // Automatically enables iCloud capability of the generated Xcode project
 
 #if UNITY_IOS
 #if !UNITY_2017_1_OR_NEWER
